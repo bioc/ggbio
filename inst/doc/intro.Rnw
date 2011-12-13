@@ -506,7 +506,7 @@ p.splice2 <- qplot(exons.rbm17, freq = freqs, show.label = TRUE, offset = 0.05,
 % <<splice1, fig = TRUE>>=
 % print(p.splice1)
 % @ %def 
-\includegraphics[width = 0.8\textwidth]{splicenofreq.png}
+\includegraphics[width = 0.8\textwidth]{figures/splicenofreq.png}
 \caption{Transcripts model of gene RBM17}
   \label{fig:splice1}
 \end{figure}
@@ -517,7 +517,7 @@ p.splice2 <- qplot(exons.rbm17, freq = freqs, show.label = TRUE, offset = 0.05,
 % <<splice2, fig = TRUE>>=
 % print(p.splice2)
 % @ %def 
-\includegraphics[width = 0.8\textwidth]{splicefreq.png}
+\includegraphics[width = 0.8\textwidth]{figures/splicefreq.png}
 \caption{Model with frequency indicated}
   \label{fig:splice2}
 \end{figure}
@@ -546,7 +546,7 @@ grid.arrange(p1, p2, p3, p4, ncol = 2)
 % \end{figure}
 \begin{figure}[h!t!p]
   \centering
-\includegraphics[width = 0.6\textwidth]{intro-iranges-plot.pdf}
+\includegraphics[width = 0.6\textwidth]{figures/intro-iranges-plot.pdf}
 \caption{qplot for \Robject{IRanges}. Similar to \Robject{GRanges},
   but we don't have seqnames information about it}
   \label{fig:iranges-plot}
@@ -689,7 +689,7 @@ tracks(p1, p2, p3, p4, p5)
 
 \begin{figure}[h!t!p!b]
   \centering
-\includegraphics[width = 0.7\textwidth]{intro-bam-plot.png}
+\includegraphics[width = 0.7\textwidth]{figures/intro-bam-plot.png}
   \caption{Tracks of different geom of bam file, in the order of gapped.pair, gapped.pair with junction, full, coverage.line, coverage.polygon, mismatch.summary.}
   \label{fig:bam-plot}
 \end{figure}
@@ -719,7 +719,7 @@ dev.off()
 
  \begin{figure}[h!t!b!p]
    \centering
-   \includegraphics[width = 0.8\textwidth]{intro-txdb-plot.pdf}
+   \includegraphics[width = 0.8\textwidth]{figures/intro-txdb-plot.pdf}
    \caption{TranscriptDb visualization. First track showing full
      model, second track showing reduced one. and last one show exons
      in isoforms.}
@@ -919,7 +919,7 @@ p.zoom <- plotSingleChrom(hg19IdeogramCyto, subchr = "chr1",
 
 \begin{figure}[h!t!p]
   \centering
-  \includegraphics[height = .26in, width = 5in]{intro-plotSingleChrom.pdf}
+  \includegraphics[height = .26in, width = 5in]{figures/intro-plotSingleChrom.pdf}
 \caption{Single Chromosome as Ideogram. The top plot shows simple single chromosome,
   and the bottom one shows the one with fixed zoom window.}
   \label{fig:plotSingleChrom}
@@ -1119,7 +1119,7 @@ print(p1)
 \begin{figure}[h!t!p!b]
   \centering
 % need a grphic here
-  \includegraphics[width = 0.7\textwidth]{intro-plotSpliceSum.pdf}  
+  \includegraphics[width = 0.7\textwidth]{figures/intro-plotSpliceSum.pdf}  
   \caption{Plot for splicing summary, intervally converted to GRangesList. the height of the rectangle shows the supported evidence.}
   \label{fig:plotSpliceSum}
 \end{figure}
@@ -1166,7 +1166,7 @@ plotFragLength(bamfile, exons.new, geom = c("point","segment"),
 
 \begin{figure}[h!t!p!b]
   \centering
-  \includegraphics[width = 0.6\textwidth]{fullfrag-anno.png}
+  \includegraphics[width = 0.6\textwidth]{figures/fullfrag-anno.png}
   \caption{Fragment length with annotation. y value of
     "point" and "line" indicate the estimated fragment length. and if
     geom is set to "segment", the segment is from the left most position
@@ -1176,14 +1176,14 @@ plotFragLength(bamfile, exons.new, geom = c("point","segment"),
 
 \begin{figure}[h!t!p!b]
   \centering
-  \includegraphics[width = 0.6\textwidth]{fullfrag.png}
+  \includegraphics[width = 0.6\textwidth]{figures/fullfrag.png}
   \caption{Fragment length without annotation, but showing y scales.}
   \label{fig:fragfull}
 \end{figure}
 
 \begin{figure}[h!t!p!b]
   \centering
-  \includegraphics[width = 0.6\textwidth]{shrink-frag.png}
+  \includegraphics[width = 0.6\textwidth]{figures/shrink-frag.png}
   \caption{Fragment length with annotation after shrinking}
   \label{fig:shrink-frag}
 \end{figure}
@@ -1289,7 +1289,7 @@ plotRangesLinkedToData(exon.new, stat.col = c("sample1", "sample2"))
 
 \begin{figure}[h!t!p!b]
   \centering
-  \includegraphics[width = 0.6\textwidth]{intro-plotRangesLinkedToData.pdf}
+  \includegraphics[width = 0.6\textwidth]{figures/intro-plotRangesLinkedToData.pdf}
   \caption{Single Granges object for multiple samples}
   \label{fig:singlelink}
 \end{figure}
@@ -1302,7 +1302,7 @@ plotRangesLinkedToData(exon.new, stat.col = 1:2, annotation = list(p))
 
 \begin{figure}[h!t!p!b]
   \centering
-   \includegraphics[width = 0.6\textwidth]{link2.png}  
+   \includegraphics[width = 0.6\textwidth]{figures/link2.png}  
   \caption{Single Granges object for multiple samples with annotation track.}
   \label{fig:singlelink-anno}
 \end{figure}
