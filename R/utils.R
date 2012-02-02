@@ -136,11 +136,7 @@ getGap <- function(data, group.name){
     gps <- gaps(ranges(x))
     if(length(gps)){
       gr <- GRanges(unique(as.character(seqnames(x))), gps)
-      ## wait this request a .levels?
       values(gr)$.levels <- unique(values(x)$.levels)
-      ## values(gr)$.model.group <- unique(values(x)$.model.group)
-      ## if(".freq" %in% colnames(values(x)))
-      ##   values(gr)$.freq <- unique(values(x)$.freq)
       gr
     }else{
       NULL

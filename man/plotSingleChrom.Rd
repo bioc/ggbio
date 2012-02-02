@@ -18,6 +18,7 @@ information about cytoband.}
 }
 }
 \examples{data(hg19IdeogramCyto)
+library(grid)
 vp1 <- viewport(width = 1, height = 0.14)
 p <- plotSingleChrom(hg19IdeogramCyto, subchr = "chr1")
 print(p, vp = vp1)}

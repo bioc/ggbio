@@ -31,6 +31,7 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                                show.label = FALSE,
                                geom = c("full", "line","point",
                                  "segment", "coverage.line", "coverage.polygon")){
+
   geom <- match.arg(geom)
   args <- as.list(match.call(call = sys.call(sys.parent()))[-1])
   ## args <- as.list(match.call(expand.dots = FALSE)[-1])
@@ -42,7 +43,6 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
     freq <- args$freq
     args <- args[names(args) != "freq"]
   }
-    
   ## check "x", must be one of "start", "end", "midpoint"??
   if(!(geom %in% c("full", "segment"))){
     if("x" %in% names(args)){
@@ -91,15 +91,21 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
           facet <- do.call(facet_wrap, args.facet)
         }
       }}else{
-        args.facet <- c(args.facet, list(facets = substitute(~.id.name)))
-        args.facet$scales <- "free"
         facet.logic <- ifelse(any(c("nrow", "ncol") %in% names(args.facet)),
                               TRUE, FALSE)
+        args.facet$scales <- "free"        
+        if(facet.logic)
+          args.facet <- c(args.facet, list(facets = substitute(~.id.name)))
+        else
+          args.facet <- c(args.facet, list(facets = substitute(.~.id.name)))
+
         if(facet.logic)
          facet <- do.call(facet_wrap, args.facet)
         else
           facet <- do.call(facet_grid, args.facet)
       }
+  ## remove facets from args
+  args <- args[names(args) != "facets"]
   ## seqlevels(data) <- seqname
   data <- keepSeqlevels(data, seqname)
   p <- switch(geom,
@@ -131,9 +137,10 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                   lst.rc <- rangesCentric(data, facet_gr)
                   data <- lst.rc$gr
                   facet_gr.r <- lst.rc$which
-                  if(args.facet$facets == "~.id.name")
+                  f.n <- length(args.facet$facets)
+                  if(args.facet$facets[[f.n]] == ".id.name")
                     grl <- split(data, values(data)$.id.name)
-                  if(args.facet$facets == "~seqnames")
+                  if(args.facet$facets[[f.n]] == "seqnames")
                     grl <- split(data, seqnames(data))
                 }else{
                   grl <- split(data, seqnames(data))
@@ -163,6 +170,7 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                 df <- as.data.frame(data)
                 df$midpoint <- (df$start+df$end)/2
                 p <- ggplot(df)
+                ## p + geom_point(aes( x= start, y = value))
                 args <- args[!(names(args) %in% c("x", "y"))]
                 if(!("color" %in% names(args))){
                   if("fill" %in% names(args)){
@@ -214,6 +222,7 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                                      ymin = substitute(.levels - 0.4),
                                      ymax = substitute(.levels + 0.4)))
                 args.rect <- args[names(args) != "size"]
+                ## args.rect <- args.rect[names(args.rect) != "facets"]
                 p <- p + geom_rect(do.call("aes", args.rect))
                 if(isStrand)
                   p <- p + scale_color_manual(values = strandColor)+
@@ -225,9 +234,10 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                   lst.rc <- rangesCentric(data, facet_gr)
                   data <- lst.rc$gr
                   facet_gr.r <- lst.rc$which
-                  if(args.facet$facets == "~.id.name")
+                  f.n <- length(args.facet$facets)                  
+                  if(args.facet$facets[[f.n]] == ".id.name")
                     grl <- split(data, values(data)$.id.name)
-                  if(args.facet$facets == "~seqnames")
+                  if(args.facet$facets[[f.n]] == "seqnames")
                     grl <- split(data, seqnames(data))
                 }else{
                   grl <- split(data, seqnames(data))                  
@@ -325,13 +335,15 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                   lst.rc <- rangesCentric(data, facet_gr)
                   data <- lst.rc$gr
                   facet_gr.r <- lst.rc$which
-                  if(args.facet$facets == "~.id.name")
+                  f.n <- length(args.facet$facets)                                    
+                  if(args.facet$facets[[f.n]] == ".id.name")
                     grl <- split(data, values(data)$.id.name)
-                  if(args.facet$facets == "~seqnames")
+                  if(args.facet$facets[[f.n]] == "seqnames")
                     grl <- split(data, seqnames(data))
                 }else{
-                  grl <- split(data, seqnames(data))
+                  grl <- split(data, seqnames(data))                  
                 }
+
                data <- lapply(grl,
                                function(dt){
                                     if(!is.null(allvars) &&
@@ -386,10 +398,10 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                   lst.rc <- rangesCentric(data, facet_gr)
                   data <- lst.rc$gr
                   ## facet_gr.r <- lst.rc$which
-                  if(args.facet$facets == "~.id.name")
+                  f.n <- length(args.facet$facets)
+                  if(args.facet$facets[[f.n]] == ".id.name")
                     grl <- split(data, values(data)$.id.name)
-                  
-                  if(args.facet$facets == "~seqnames")
+                  if(args.facet$facets[[f.n]] == "seqnames")
                     grl <- split(data, seqnames(data))
                 }else{
                   grl <- split(data, seqnames(data))
@@ -447,6 +459,7 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                   ylab("coverage")
               }
               )
+
   if(!legend)
     p <- p + opts(legend.position = "none")
   if("xlab" %in% names(args))
@@ -605,55 +618,42 @@ setMethod("qplot", "GappedAlignments", function(data, ...,
   geom <- match.arg(geom)
   args <- as.list(match.call(call = sys.call(sys.parent())))[-1]
   args <- args[!(names(args) %in% c("geom", "which", "show.junction",
-                                    "show.pair"))]
+                                    "show.pair", "data"))]
   if(!missing(which))
     gr <- biovizBase:::fetch(data, which)
   else
     gr <- biovizBase:::fetch(data)
   if(geom == "gapped.pair"){
-  gr.junction <- gr[values(gr)$junction == TRUE]
-  ## grl <- split(gr.junction, values(gr.junction)$read.group)
-  ## get gaps??
-  ## ir.gaps <- unlist(gaps(ranges(grl)))
-  ## .lvs <- values(gr.junction)$.levels[match(names(ir.gaps),
-  ##                                         values(gr.junction)$read.group)]
-  ## seqs <- unique(as.character(seqnames(gr.junction)))
-  gr.gaps <- getGap(gr.junction, "qname")
-  ## gr.gaps <- GRanges(seqs, ir.gaps, .levels = .lvs)
-  gr.read <- gr  
-  ## if(shrink){
-  ##   max.gap <- maxGap(gr.read, shrink.ratio)
-  ##   if(missing(shrink.fun))
-  ##     shrink.fun <- shrinkageFun(gr.gaps, max.gap = max.gap)
-  ##   gr.read <- shrink.fun(gr.read)
-  ##   gr.gaps <- shrink.fun(gr.gaps)
-  ## }
-  df.read <- as.data.frame(gr.read)
-  df.gaps <- as.data.frame(gr.gaps)
-  p <- ggplot(df.read)
-  strandColor <- getOption("biovizBase")$strandColor
-  if(!("color" %in% names(args))){
-    if("fill" %in% names(args))
-      args <- c(args, list(color = substitute(fill)))
-    else
-      args <- c(args, list(color = substitute(strand),
-                           fill = substitute(strand)))
-  }
-  args <- c(args, list(xmin = substitute(start),
-                       xmax = substitute(end),
-                       ymin = substitute(.levels - 0.4),
-                       ymax = substitute(.levels + 0.4)))
-  p <- p + geom_rect(do.call("aes", args))+
-    scale_color_manual(values = strandColor) +
-      scale_fill_manual(values = strandColor)
-  ## mapped read
-  if(show.junction){
-  args <- args[!(names(args) %in% c("x", "y"))]
-  args <- c(args, list(x = substitute(start), xend = substitute(end),
-                       y = substitute(.levels),
-                       yend = substitute(.levels)))
-  p <- p + geom_segment(data = df.gaps, do.call("aes", args), color = "red")
-}}
+    gr.junction <- gr[values(gr)$junction == TRUE]
+    gr.gaps <- getGap(gr.junction, "qname")
+    gr.read <- gr      
+    df.read <- as.data.frame(gr.read)
+    df.gaps <- as.data.frame(gr.gaps)
+    p <- ggplot(df.read)
+    strandColor <- getOption("biovizBase")$strandColor
+    if(!("color" %in% names(args))){
+      if("fill" %in% names(args))
+        args <- c(args, list(color = substitute(fill)))
+      else
+        args <- c(args, list(color = substitute(strand),
+                             fill = substitute(strand)))
+    }
+    args <- c(args, list(xmin = substitute(start),
+                         xmax = substitute(end),
+                         ymin = substitute(.levels - 0.4),
+                         ymax = substitute(.levels + 0.4)))
+
+    p <- p + geom_rect(do.call("aes", args))+
+      scale_color_manual(values = strandColor) +
+        scale_fill_manual(values = strandColor)
+    ## mapped read
+    if(show.junction){
+      args <- args[!(names(args) %in% c("x", "y"))]
+      args <- c(args, list(x = substitute(start), xend = substitute(end),
+                           y = substitute(.levels),
+                           yend = substitute(.levels)))
+      p <- p + geom_segment(data = df.gaps, do.call("aes", args), color = "red")
+    }}
   if(geom == "full"){
     p <- qplot(gr)
   }
