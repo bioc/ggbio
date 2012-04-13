@@ -11,14 +11,11 @@ single nucleotide polymorphism. So higher the value, more stronger the
 association they are.
 }
 \usage{
-plotGrandLinear(obj, y, facets, size, shape, color, alpha, ..., geom =
-                 c("point", "line"), color.type = c("twocolor",
-                 "identity", "seqnames"), two.color = c("#0080FF",
-                 "#4CC4FF"), cutoff = NULL, cutoff.color = "red",
-                 cutoff.size = 1, legend = FALSE, xlim, ylim, xlab =
-                 "Genomic Coordinates", ylab = substitute(y), main,
-                 theme)
-
+plotGrandLinear(obj, ..., facets, space.skip = 0.01, geom = NULL,
+                 cutoff = NULL, cutoff.color = "red", cutoff.size = 1,
+                 legend = FALSE, xlim, ylim,
+                 xlab = "Genomic Coordinates",
+                 ylab = substitute(y), main, theme)
 }
 \arguments{
   \item{obj}{
@@ -26,50 +23,17 @@ plotGrandLinear(obj, y, facets, size, shape, color, alpha, ..., geom =
     pass this object, they need to make sure the pvalue has been changed
     to -log10(p).
   }
-  \item{y}{
-    Unevaluated name which should be one the of the column names
-    indicating the p-value Or other score used as y value in the plot.
-    This is required field.
-  }
-  \item{size}{
-    Size for point or lines. Could equal a column name or a fixed
-    number. When it's fixed, please use \code{I()} to wrap the value.
-  }
-  \item{shape}{
-    Shape for point or lines. Could equal a column name or a fixed
-    number. When it's fixed, please use \code{I()} to wrap the value.
-  }
-  \item{color}{
-    Color for point for lines. Could equal a column name or a fixed
-    character. When it's fixed, please use \code{I()} to wrap the value.
-  }
-  \item{alpha}{
-    Alpha blending. Could equal a column name or a fixed
-    number. When it's fixed, please use \code{I()} to wrap the value.
-  }
   \item{...}{
-    Extra arguments passed. Will be automatically dispatched to the
-    right place, such as scales, space. When you try to use a faceted
-    seqnames, you need to specify \code{scales = "free"} and \code{space
-      = "free"}, if you want a free scaled x-scale.
+    extra arguments passed. such as color, size, alpha.
+  }
+  \item{facets}{
+    facets formula, such as group ~ .
+  }
+  \item{space.skip}{
+    numeric value for skip ratio, between chromosome spaces.default is 0.01.
   }
   \item{geom}{
-    "point"(default) or "line". When it's line, it will make sure the
-    line is not connect cross different chromosomes.
-  }
-  
-  \item{color.type}{
-    "identity" use single color for all points, when it's enabled, you
-    can specify color in the arguments to equal a character or an
-    unevaluated name, when use specific color, try use \code{I}, for
-    instance, color = I("red"); "seqnames" use default
-    discrete color scheme for all chromosomes; "twocolor" use two colors
-    to represent all the chromosomes, could specify color in the
-    two.color argument.
-  }
-  \item{two.color}{
-    A character vector of two. Default is chosen from dichromat palette
-    "BluetoOrange.8", make sure it's color-blind safe.
+    geometric object, defualt is "point".
   }
   \item{cutoff}{
     A numeric vector which used as cutoff for Manhattan plot.
@@ -84,91 +48,138 @@ plotGrandLinear(obj, y, facets, size, shape, color, alpha, ..., geom =
     A logical value indicate whether to show legend or not. Default is
     FALSE which disabled the legend.
   }
+  \item{xlim}{
+    limits for x scale.
+  }
+  \item{ylim}{
+    limits for y scale.
+  }
   \item{xlab}{
     Label for xscale.
   }
   \item{ylab}{
     Label for yscale.
   }
-  \item{facets}{
-  }
-  \item{xlim}{
-  }
-  \item{ylim}{
-  }
   \item{main}{
+    title.
   }
   \item{theme}{
+    theme options.
   }
 }
 \value{
   Return a ggplot object. 
 }
 \details{
-If scales and space are free, then the mapping between position 
-and values in the data will be the same across all panels   
+  Please use seqlengths of the object and space.skip arguments to
+  control the layout of the coordiant genome transformation.
+
+  aes(y = ...) is requried.
+
+  aes(color = ) is used to mapping to data variables, if just pass
+  "color" without aes(), then will recycle the color to represent each
+  chromosomes.please see the example below.
+  
 }
 \examples{
 \dontrun{
-library(GenomicRanges)
+## @knitr load
 library(ggbio)
 data(hg19IdeogramCyto, package = "biovizBase")
 data(hg19Ideogram, package = "biovizBase")
+library(GenomicRanges)
+
+## @knitr simul_gr
+library(biovizBase)
+gr <- GRanges(rep(c("chr1", "chr2"), each = 5),
+              IRanges(start = rep(seq(1, 100, length = 5), times = 2),
+                      width = 50))
+autoplot(gr)
+
+## @knitr coord:genome
+autoplot(gr, coord = "genome")
+gr.t <- transformToGenome(gr)
+head(gr.t)
+
+## @knitr is
+is_coord_genome(gr.t)
+metadata(gr.t)$coord
+
+
+## @knitr simul_snp
 chrs <- as.character(levels(seqnames(hg19IdeogramCyto)))
 seqlths <- seqlengths(hg19Ideogram)[chrs]
 set.seed(1)
 nchr <- length(chrs)
-nsnps <- 1000
+nsnps <- 100
 gr.snp <- GRanges(rep(chrs,each=nsnps),
-                  IRanges(start = do.call(c, lapply(chrs, function(chr){
-                    N <- seqlths[chr]
-                    runif(nsnps,1,N)
-                  })), width = 1),
+                  IRanges(start =
+                          do.call(c, lapply(chrs, function(chr){
+                            N <- seqlths[chr]
+                            runif(nsnps,1,N)
+                          })), width = 1),
                   SNP=sapply(1:(nchr*nsnps), function(x) paste("rs",x,sep='')),
                   pvalue =  -log10(runif(nchr*nsnps)),
                   group = sample(c("Normal", "Tumor"), size = nchr*nsnps,
                     replace = TRUE)
                   )
-## processing the name
+
+## @knitr shorter
+seqlengths(gr.snp)
 nms <- seqnames(seqinfo(gr.snp))
 nms.new <- gsub("chr", "", nms)
 names(nms.new) <- nms
 gr.snp <- renameSeqlevels(gr.snp, nms.new)
+seqlengths(gr.snp)
 
 
-## compact view
-## no facet by samples, but make sure you want it that way
-## default is two color
-plotGrandLinear(gr.snp, y = pvalue, geom = "point")
-## facet by samples, comparison across groups
-plotGrandLinear(gr.snp, y = pvalue, geom = "point",
-                facet = group ~ .,  color.type = "twocolor")
-## change two color
-plotGrandLinear(gr.snp, y = pvalue, geom = "point",
-                facet = group ~ .,  color.type = "twocolor",
-                two.color = c("red", "blue"))
-## geom line
-plotGrandLinear(gr.snp, y = pvalue,
-                geom = "line", facet = group ~ .)  
+
+## @knitr unorder
+autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), space.skip = 0.01)
+
+## @knitr sort
+gr.snp <- keepSeqlevels(gr.snp, c(1:22, "X", "Y"))
+autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), space.skip = 0.01)
+
+## @knitr with_seql
+names(seqlths) <- gsub("chr", "", names(seqlths))
+seqlengths(gr.snp) <- seqlths[names(seqlengths(gr.snp))]
+autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), space.skip = 0.01)
+
+## @knitr line
+autoplot(gr.snp, coord = "genome", geom = "line", aes(y = pvalue, group = .ori.seqnames,
+                                     color = .ori.seqnames))
 
 
-## add size and change color
-plotGrandLinear(gr.snp, y = pvalue, size = pvalue,geom = "point",
-                facet = group ~ .,  color.type = "seqnames")
 
-plotGrandLinear(gr.snp, y = pvalue, size = I(0.05),
-                geom = "point", facet = group ~ .)
+## @knitr plotGrandLinear
+plotGrandLinear(gr.snp, aes(y = pvalue))
 
-plotGrandLinear(gr.snp, y = pvalue, color = group, geom = "point",
-                facet = group ~ .,
-                color.type = "identity")
+## @knitr morecolor
+plotGrandLinear(gr.snp, aes(y = pvalue, color = seqnames))
+plotGrandLinear(gr.snp, aes(y = pvalue), color = c("green", "deepskyblue"))
+plotGrandLinear(gr.snp, aes(y = pvalue), color = c("green", "deepskyblue", "red"))
+plotGrandLinear(gr.snp, aes(y = pvalue), color = "red")
 
-plotGrandLinear(gr.snp, y = pvalue, color = I("blue"), geom = "point", facet = group ~ .,
-                color.type = "identity")
+## @knitr cutoff
+plotGrandLinear(gr.snp, aes(y = pvalue), cutoff = 3, cutoff.color = "blue", cutoff.size = 4)
 
-## facet by seqnames, slower
-plotGrandLinear(gr.snp, y = pvalue,geom = "point", 
-                facet = group ~ seqnames, scales = "free", space = "free")
+## @knitr cutoff-low
+plotGrandLinear(gr.snp, aes(y = pvalue)) + geom_hline(yintercept = 3, color = "blue", size = 4)
+
+## @knitr longer
+## let's make a long name
+nms <- seqnames(seqinfo(gr.snp))
+nms.new <- paste("chr00000", nms, sep = "")
+names(nms.new) <- nms
+gr.snp <- renameSeqlevels(gr.snp, nms.new)
+seqlengths(gr.snp)
+
+## @knitr rotate
+plotGrandLinear(gr.snp, aes(y = pvalue)) + opts(axis.text.x=theme_text(angle=-90, hjust=0))
+
+## @knitr sessionInfo
+sessionInfo()
 
 }
 }

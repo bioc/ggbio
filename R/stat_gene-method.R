@@ -1,6 +1,9 @@
 ## FIXME: more flexible name.expr arguments
 setGeneric("stat_gene", function(data, ...) standardGeneric("stat_gene"))
-setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim, 
+setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
+                                                truncate.gaps = FALSE,
+                                                truncate.fun = NULL,
+                                                ratio = 0.0025, 
                                                 xlab, ylab, main,
                                                 facets = NULL,
                                                 geom = c("gene", "reduced_gene"),
@@ -30,7 +33,9 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
   }
   if(geom == "gene"){
     message("Aggregating TranscriptDb...")
-    gr <- biovizBase:::fetch(object, which)
+    gr <- biovizBase:::fetch(object, which, truncate.gaps = truncate.gaps,
+                             truncate.fun = truncate.fun, ratio = ratio)
+    if(length(gr)){
     message("Constructing graphics...")
     values(gr)$stepping <-  as.numeric(values(gr)$tx_id)
     ## drawing
@@ -71,7 +76,6 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     }
     ## utrs
     df.utr <- df[df$type == "utr",]
-
     ## add a segment for hacking at 1pix
     args.utr <- args.aes[names(args.aes) != "y"]
     args.utr <- c(args.utr, list(x = substitute(start),
@@ -98,7 +102,9 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     
     ## p <- p + geom_rect(data = df.utr, do.call("aes", args))
     ## gaps
-    df.gaps <- gr[values(gr)$type == "gap"] 
+    ## df.gaps <- gr[values(gr)$type == "gap"]
+    df.gaps <- getGaps(c(gr[values(gr)$type %in% c("utr", "cds")]),
+                       group.name = "tx_id")
     args.aes.gaps <- args.aes[!(names(args.aes) %in% c("x", "y", "fill"))]
     aes.res <- do.call(aes, args.aes.gaps)
     args.gaps.res <- c(list(data = df.gaps),
@@ -132,10 +138,17 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     ## }
     p <- c(p , list(scale_y_continuous(breaks = .df.sub$stepping,
                                 labels = .labels)))
+  }else{
+    p <- NULL
+  }
   }
   if(geom == "reduced_gene"){
     message("Aggregating TranscriptDb...")
-    gr <- biovizBase:::fetch(object, which, type = "single")
+    gr <- biovizBase:::fetch(object, which, type = "single",
+                             truncate.gaps = truncate.gaps,
+                             truncate.fun = truncate.fun, ratio = ratio)
+
+    if(length(gr)){
     ## gr <- fetch(object, which, type = "single")
     message("Constructing graphics...")
     values(gr)$stepping <-  1
@@ -178,9 +191,13 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
                   list(aes.res),
                   args.non)
     p <- c(p, list(do.call(geom_chevron, args.res)))
+  }else{
+    p <- NULL
+  }
     p <- c(p, list(scale_y_continuous(breaks = NULL)), list(opts(axis.text.y = theme_blank())))
   }
   if(missing(xlab)){
+    if(length(gr)){
     chrs <- unique(seqnames(gr))
     gms <- genome(object)
     gm <- unique(gms[chrs])
@@ -190,6 +207,8 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     }else{
       gm.tx <- paste(gm)
       xlab <- paste(gm.tx,"::",chrs.tx, sep = "")      
+    }}else{
+      xlab <- ""
     }
   }
   p <- c(p, list(xlab(xlab)))
@@ -201,9 +220,17 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
   if(!missing(main))
     p <- c(p, opts(title = main))
   
-  if(missing(xlim))
-    xlim <- c(start(range(gr)),
-              end(range(gr)))
+  if(!missing(xlim)){
+    ## xlim <- c(start(range(gr)),
+    ##           end(range(gr)))
   p <- c(p, list(coord_cartesian(xlim = xlim, wise = TRUE)))
-  
+  }
+  ## test scale
+  if(is_coord_truncate_gaps(gr)){
+    gr <- gr[values(gr)$type %in% c("utr", "cds")]
+    ss <- getXScale(gr)
+    p <- c(p, list(scale_x_continuous(breaks = ss$breaks,
+                                labels = ss$labels)))
+  }
+  p  
 })

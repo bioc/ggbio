@@ -11,7 +11,6 @@ setMethod("geom_alignment", "GRanges", function(data,...,
                                                 group.selfish = TRUE){
    
 
-
   stat <- match.arg(stat)
   args <- list(...)
   args$facets <- facets
@@ -19,8 +18,8 @@ setMethod("geom_alignment", "GRanges", function(data,...,
   args.non <- parseArgsForNonAes(args)
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
   facet <- .buildFacetsFromArgs(data, args.facets)
-  
-  rect.height <- force(rect.height)
+
+  ## rect.height <- force(rect.height)
 
   main.geom <- match.arg(main.geom)
   gap.geom <- match.arg(gap.geom)
@@ -45,11 +44,10 @@ setMethod("geom_alignment", "GRanges", function(data,...,
                       geom_segment
                     }
                     )
+  if(length(data)){
   if(stat == "stepping"){
     args.aes <- args.aes[!(names(args.aes) %in% c("xmin", "xmax", "ymin", "ymax", "data"))]
     args.non <- args.non[!(names(args.non) %in% c("xmin", "xmin", "ymin", "ymax", "data"))]
-    ## if(rect.height <= 0 | rect.height >= 0.5)
-    ##   stop("rect.height must be a value in (0,0.5)")
     grl <- splitByFacets(data, facets)
     res <- endoapply(grl,
                      function(dt){
@@ -60,6 +58,7 @@ setMethod("geom_alignment", "GRanges", function(data,...,
                          dt <- addStepping(dt)
                        }
                      })
+    
     res <- unlist(res)
     df <- fortify(res)
 
@@ -71,7 +70,7 @@ setMethod("geom_alignment", "GRanges", function(data,...,
     args.aes <- args.aes[names(args.aes) != "group"]
     ## plot gaps
 
-    gps <- suppressWarnings(getGap(res, group.name = gpn, facets))
+    gps <- getGaps(res, group.name = gpn, facets)
     if(length(gps)){
     gps <- keepSeqlevels(gps, names(seqlengths(res)))
     args.gaps <- args.aes[!names(args.aes) %in% c("x", "y",
@@ -101,6 +100,7 @@ setMethod("geom_alignment", "GRanges", function(data,...,
     aes <- do.call(ggplot2::aes, args.aes)
     args.res <- c(list(data = res), list(aes),
                   args.non)
+
     p <- c(p, list(do.call(main.fun,args.res)))
     p <- .changeStrandColor(p, args.aes)
     .df.lvs <- unique(df$stepping)
@@ -115,6 +115,8 @@ setMethod("geom_alignment", "GRanges", function(data,...,
   
   if(stat == "identity"){
    stop("stat identity is nor supported for geom alignment") 
+  }}else{
+    p <- NULL
   }
     p <- c(list(p) , list(ggplot2::ylab("")), list(facet))
   if(!missing(xlab))

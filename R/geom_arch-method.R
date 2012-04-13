@@ -44,16 +44,17 @@ setMethod("geom_arch", "data.frame", function(data, ...,
   xx<-c(1,xx,rev(-xx),-1)
   yy<-c(0,yy,rev(yy), 0)
   ##SETS UP DATAFRAME TO KEEP TRACK OF ALL POINTS TO DRAW ALL ARCHES
-  apoint<-data.frame()
-  jump<-abs(endX-startX)
-  jumpAdj <- max(jump)/max(abs(h))
-  for(i in 1:length(startX)){
-    temp<-data.frame(xx = xx*(abs(startX[i]-endX[i])/2)+(startX[i]+endX[i])/2,
-                     yy=yy*h[i]+y[i],
-                     junc = i,
-                     s=((abs(h[i])-jump[i]/jumpAdj))/max(jump))
-    apoint<-rbind(apoint,temp)	
-  }
+  junc <- rep(seq_along(startX), each = length(xx))
+  startX <- rep(startX, each = length(xx))
+  endX <- rep(endX, each = length(xx))
+  h <- rep(h, each = length(xx))
+  y <- rep(y, each = length(xx))
+  jump <- abs(endX - startX)
+  jumpAdj <- if (length(jump)) max(jump) / max(abs(h)) else NA
+  apoint <- data.frame(xx = xx * (abs(startX - endX) / 2) + (startX + endX) / 2,
+                       yy = yy * h + y, junc,
+                       s = ((abs(h) - jump / jumpAdj)) /
+                           if (length(jump)) max(jump) else NA)
   data$junc <- seq_len(nrow(data))
   apoint <- merge(apoint, data, by = "junc")
   args.aes <- list(x = as.name("xx"),
@@ -61,13 +62,19 @@ setMethod("geom_arch", "data.frame", function(data, ...,
                   group = as.name("junc"))
   
   aesres <- do.call(aes, c(args.aes, args.aes2))
-  reslst <- c(list(data = apoint), list(aesres),args.non)
-  do.call(geom_line, reslst)
+  if(nrow(apoint)){
+    reslst <- c(list(data = apoint), list(aesres),args.non)
+    p <- do.call(geom_line, reslst)
+  }else{
+    p <- NULL
+  }
+  p
 })
 
-
 ## that means span the range of two end 
-setMethod("geom_arch", "GRanges", function(data, ..., facets = NULL, rect.height = 0.4,
+setMethod("geom_arch", "GRanges", function(data, ...,
+                                           xlab, ylab, main,
+                                           facets = NULL, rect.height = 0,
                                               n = 25, max.height = 10
                                               ){
 
@@ -94,13 +101,23 @@ setMethod("geom_arch", "GRanges", function(data, ..., facets = NULL, rect.height
     df$.y <- rep(0, nrow(df)) + rect.height * signs
     args.aes$y <- substitute(.y)
   }
-
-
-  args.res <- c(list(data = df),
-                args.non,
-                list(do.call(aes, args.aes)))
-  p <- do.call(geom_arch, args.res)
-  p <- c(list(p) , list(facet))            
+  if(nrow(df)){
+    args.res <- c(list(data = df),
+                  args.non,
+                  list(do.call(aes, args.aes)))
+    p <- do.call(geom_arch, args.res)
+    p <- c(list(p) , list(facet))
+  }else{
+    p <- NULL
+  }
+  if(!missing(xlab))
+    p <- c(p, list(ggplot2::xlab(xlab)))
+  else
+    p <- c(p, list(ggplot2::xlab("Genomic Coordinates")))
+  if(!missing(ylab))
+    p <- c(p, list(ggplot2::ylab(ylab)))
+  if(!missing(main))
+    p <- c(p, list(opts(title = main)))
   p
 })
 
