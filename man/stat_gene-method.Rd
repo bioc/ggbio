@@ -8,11 +8,9 @@
 \usage{
 \S4method{stat_gene}{TranscriptDb}(data, ..., which, xlim, truncate.gaps = FALSE,
                  truncate.fun = NULL, ratio = 0.0025, xlab, ylab, main,
-                 facets = NULL, geom = c("gene", "reduced_gene"),
-                 names.expr = expression(paste(tx_name, "(", gene_id,
-                 ")", sep = "")))
-
-
+                 facets = NULL, geom = "gene", stat = c("identity",
+                 "reduce"), names.expr = expression(paste(tx_name, "(",
+                 gene_id, ")", sep = "")))
 }
 \arguments{
   \item{data}{
@@ -50,9 +48,10 @@
     Faceting formula to use.
   }
   \item{geom}{
-    The geometric object to use display the data. 'gene' shows full gene
-    model with 5'-utr, 3'-utr and cds. "reduced_gene" shos reduced
-    single gene structure.
+    geometric object. only support "gene" now.
+  }
+  \item{stat}{
+    defualt "identity" give full gene model and "reduce" for reduced model.
   }
   \item{names.expr}{
     Expression for showing y label.
@@ -68,8 +67,8 @@ data(genesymbol, package = "biovizBase")
 txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 
 ## @knitr tracks
-p1 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], fill = "gray40", geom = "gene")
-p2 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], geom = "reduced_gene")
+p1 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"])
+p2 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], stat = "reduce")
 tracks(p1, p2, heights = c(3, 1))
 }
 \author{Tengfei Yin}
