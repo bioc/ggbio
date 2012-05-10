@@ -115,7 +115,7 @@ autoplot(grl, args = list(list(geom = "link" , linked.to = "to.gr", aes(color = 
                                 color = "steelblue"),                
                            list(geom = "ideo", fill = "gray70"),
                            list(geom = "scale", size = 2),
-                           list(geom = "text", aes(label  = .ori.seqnames), vjust = 0)),
+                           list(geom = "text", aes(label  = seqnames), vjust = 0)),
          trackWidth = c(1, 10, 6, 4, 2, 7), radius = 30,
          trackSkip = c(1, 1, 1, 1, 0, 1),
          grid = c(F, T, F, F, F, F)) + scale_size(range = c(1, 2.5))
