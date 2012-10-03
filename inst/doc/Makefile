@@ -9,6 +9,7 @@ clean:
 	rm -f *.tex *.bbl *.blg *.aux *.out *.log *.spl *tikzDictionary *.toc
 
 %.pdf: %.Rnw
+	rm -f *.pdf
 	$(R_HOME)/bin/Rscript -e "library(knitr); knit2pdf('$*.Rnw')"
 
 #%.pdf: %.Rnw
