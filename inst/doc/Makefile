@@ -7,7 +7,7 @@ all: $(PDFS)
 
 clean:
 	rm -f *.tex *.bbl *.blg *.aux *.out *.log *.spl *tikzDictionary *.toc
-	rm -f figures/ggbio-*	
+	rm -f figures/ggbio-*	ggbio-*
 	
 %.pdf: %.Rnw
 	$(R_HOME)/bin/Rscript -e "library(knitr); knit2pdf('$*.Rnw')"

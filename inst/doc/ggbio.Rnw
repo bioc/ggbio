@@ -10,7 +10,7 @@
 \usepackage{graphicx}
 \usepackage{fancybox}
 \usepackage{color}
-
+\SweaveOpts{eval=FALSE} 
 \setkeys{Gin}{width=0.95\textwidth}
 
 \textwidth=6.5in
@@ -69,10 +69,12 @@
 \tableofcontents
 \newpage
 
-<<setup, include=FALSE, cache=FALSE>>=
+<<setup, include=FALSE, cache=FALSE, eval = TRUE>>=
 library(knitr)
 opts_chunk$set(fig.path='./figures/ggbio-', 
-               fig.align='center', fig.show='asis')
+               fig.align='center', fig.show='asis', 
+               eval = TRUE, fig.width = 6,
+               fig.height = 6)
 options(replace.assign=TRUE,width=90)
 @
 
@@ -238,6 +240,7 @@ library(ggbio)
 library(GenomicRanges)
 set.seed(1)
 N <- 100
+
 gr <- GRanges(seqnames = 
               sample(c("chr1", "chr2", "chr3"),
                      size = N, replace = TRUE),
