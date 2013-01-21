@@ -709,7 +709,7 @@ ggl[[1]]
     }
   }
   if(plot){
-    grid.newpage()
+    ## grid.newpage()
     grid.draw(tab)
   }else{
     tab
