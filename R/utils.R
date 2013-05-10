@@ -432,7 +432,7 @@ sub_names <- function(data, name.expr){
       else
         return(name.expr)
     }
-    .res <- c(subfun(res, name.expr), .res)
+    .res <- c(.res, subfun(res, name.expr))
   }
   .res
 }
