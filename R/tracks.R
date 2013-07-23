@@ -714,7 +714,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
     }
     tab <- gtable(widths, heights)
     for(i in 1:N){
-      tab <- gtable_add_grob(tab, grobs[[i]], l = i, t = 1, b = 1)
+      tab <- gtable_add_grob(tab, grob[s[i]], l = i, t = 1, b = 1)
     }
   }
   if(plot){
@@ -741,7 +741,7 @@ spaceAroundPanel <- function(g, type = c("t", "l", "b", "r")){
     rsl[[tp]] <- switch(tp,
                 t = {
                   id <- which(g$layout$t < min(g$layout[idx, ]$t))
-                  id <- id[!duplicated(g$layout$name[id])]                  
+                  ## id <- id[!duplicated(g$layout$name[id])]                  
                   if(length(id))
                     res <- sum(g$height[unique(g$layout$t[id])])  
                   else
@@ -750,7 +750,7 @@ spaceAroundPanel <- function(g, type = c("t", "l", "b", "r")){
                 },
                 l = {
                   id <- which(g$layout$l < min(g$layout[idx, ]$l))
-                  id <- id[!duplicated(g$layout$name[id])]
+                  ## id <- id[!duplicated(g$layout$name[id])]
                   if(length(id))
                     res <- sum(g$width[unique(g$layout$l[id])])  
                   else
@@ -759,7 +759,7 @@ spaceAroundPanel <- function(g, type = c("t", "l", "b", "r")){
                 },
                 b = {
                   id <- which(g$layout$b > max(g$layout[idx, ]$b))
-                  id <- id[!duplicated(g$layout$name[id])]                  
+                  ## id <- id[!duplicated(g$layout$name[id])]                  
                   if(length(id))
                     res <- sum(g$height[unique(g$layout$b[id])])  
                   else
@@ -769,7 +769,7 @@ spaceAroundPanel <- function(g, type = c("t", "l", "b", "r")){
                 },
                 r = {
                   id <- which(g$layout$r > max(g$layout[idx, ]$r))
-                  id <- id[!duplicated(g$layout$name[id])]                  
+                  ## id <- id[!duplicated(g$layout$name[id])]                  
                   if(length(id))
                     res <- sum(g$width[unique(g$layout$r[id])])
                   else
@@ -1054,7 +1054,6 @@ setReplaceMethod("labeled", c("ideogram", "logical"), function(x, value){
   attr(x, "labeled") <- value
   x
 })
-
 
 setMethod("labeled", "gtable", function(x){
   bg <- attr(x, "labeled")
