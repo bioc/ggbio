@@ -714,7 +714,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
     }
     tab <- gtable(widths, heights)
     for(i in 1:N){
-      tab <- gtable_add_grob(tab, grob[s[i]], l = i, t = 1, b = 1)
+      tab <- gtable_add_grob(tab, grobs[[i]], l = i, t = 1, b = 1)
     }
   }
   if(plot){
