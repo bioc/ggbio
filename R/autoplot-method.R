@@ -242,7 +242,7 @@ setMethod("autoplot", "IRanges", function(object, ..., xlab, ylab, main){
 ## ======================================================================
 ##        For "GappedAlignments"
 ## ======================================================================
-setMethod("autoplot", "GappedAlignments", function(object, ...,
+setMethod("autoplot", "GAlignments", function(object, ...,
                                                    xlab, ylab, main,
                                                    which,
                                                    geom = NULL, stat = NULL){
