@@ -154,7 +154,7 @@ setMethod("autoplot", "GRanges", function(object, ..., chr,
     p <- p + facet
   p$.data <- object
   p <- ggbio(p)
-  p
+  invisible(p)
 })
 
 ## ======================================================================
