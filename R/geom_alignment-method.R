@@ -195,7 +195,7 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
     message("Aggregating TranscriptDb...")
     gr <- crunch(object, which, truncate.gaps = truncate.gaps,
                              truncate.fun = truncate.fun, ratio = ratio)
-    .xlim <- NULL    
+    .xlim <- NULL
     if(length(gr)){
       .xlim <- c(start(range(gr, ignore.strand = TRUE)),
                  end(range(gr, ignore.strand = TRUE)))    
@@ -213,7 +213,7 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
       }
       .xlim[1] <- min(.xlim) - es
       df <- mold(gr)
-      
+
       if(label){
       ## get lalel
       .df.sub <- df[, c("stepping", "tx_id", "tx_name", "gene_id")]
@@ -221,11 +221,11 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
        sts <- do.call(c, as.list(by(df, df$tx_id, function(x) min(x$start))))
       .df.sub$start <- sts - es * 0.1
       .labels <- NA
-      .df.sub
       if(is.expression(names.expr)){
         .labels <- eval(names.expr, .df.sub)
       }else if(is.character(names.expr)){
-        if(length(names.expr) == nrow(.df.sub)){
+
+        if(length(names.expr) == nrow(.df.sub) &&   !(names.expr %in% colnames(.df.sub))){
           .labels <- names.expr
         }else{
           .labels <- sub_names(.df.sub, names.expr)
@@ -236,8 +236,10 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
       .df.lvs <- unique(df$stepping)
       .df.sub$.labels <- .labels
     }
-
+      ## cds
       gr.cds <- gr[values(gr)$type == "cds"]
+      ## exons
+      gr.exons <- gr[values(gr)$type == "exon"]
       args.cds.non <- args.non
       if(!"rect.height" %in% names(args.cds.non)){
         args.cds.non$rect.height <- 0.4
@@ -253,8 +255,18 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
                           args.cds.non,
                           list(stat = "identity"))
         p <- do.call(range.fun, args.cds.res)
+    }else if(length(gr.exons)){
+        args.cds <- args.aes[names(args.aes) != "y"]
+        args.cds$y <- as.name("stepping")
+        aes.res <- do.call(aes, args.cds)
+        ## input gr.exons
+        args.cds.res <- c(list(data = gr.exons),
+                          list(aes.res),
+                          args.cds.non,
+                          list(stat = "identity"))
+        p <- do.call(range.fun, args.cds.res)
       }else{
-        p <- NULL
+          p <- NULL
       }
       ## utrs
       gr.utr <- gr[values(gr)$type == "utr"]
@@ -276,12 +288,14 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
         args.utr.non <- args.non[names(args.non) != "arrow.rate"]
         args.utr.non$arrow.head.fix <- arrow.head.fix
       }
-      
-      args.utr.res <- c(list(data = gr.utr),
-                        list(aes.res),
-                        args.utr.non,
-                        list(stat = "identity"))
-      p <- c(p, list(do.call(utr.fun, args.utr.res)))
+
+      if(length(gr.utr)){
+          args.utr.res <- c(list(data = gr.utr),
+                            list(aes.res),
+                            args.utr.non,
+                            list(stat = "identity"))
+          p <- c(p, list(do.call(utr.fun, args.utr.res)))
+      }
       
       df.gaps <- getGaps(c(gr[values(gr)$type %in% c("utr", "cds")]),
                          group.name = "tx_id")
@@ -302,8 +316,9 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
                          list(aes.res),
                          args.non,
                          list(stat = "identity"))
-      
-      p <- c(p , list(do.call(gap.fun, args.gaps.res)))
+      if(length(df.gaps)){
+          p <- c(p , list(do.call(gap.fun, args.gaps.res)))
+      }
       if(label){
       aes.label <- do.call(aes, list(label = substitute(.labels),
                                      x = substitute(start),
@@ -316,8 +331,8 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
         p <- c(p , list(do.call(geom_text, args.label.res)))
       }
       p <- c(p , list(scale_y_continuous(breaks = NULL)))      
-      ## args.
-      ## p <- c(p, list(do.call(geom_text, )))
+
+
     }else{
       p <- c(list(geom_blank()),list(ggplot2::ylim(c(0, 1))),
              list(ggplot2::xlim(c(0, 1))))
@@ -416,13 +431,14 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
     p <- c(p, list(scale_y_continuous(breaks = NULL)),
            list(theme(axis.text.y = element_blank())))
   }
-  
+
+
   if(missing(xlab)){
     xlab <- ""
   }else{
     xlab <- ggplot2::xlab(xlab)
   }
-  
+
   p <- c(p, list(xlab(xlab)))
   if(missing(ylab)){
     p <- c(p, list(ggplot2::ylab(getYLab(object))))
