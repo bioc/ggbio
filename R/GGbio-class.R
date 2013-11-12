@@ -17,6 +17,16 @@ GGbio <- function(ggplot = NULL, data = NULL, fetchable = FALSE, blank = FALSE,.
 ## alias
 ggbio <- GGbio
 
+setReplaceMethod("$", "GGbio",
+                 function(x, name, value) {
+                     x@ggplot[[name]] <- value
+                     x
+                 })
+
+setMethod("$", "GGbio",
+                 function(x, name) {
+                     x@ggplot[[name]]
+                 })
 
 ## combine command if circle presents
 .circle.geoms <- c("point","line", "link",
@@ -121,16 +131,28 @@ setMethod("+", c("GGbio"), function(e1, e2){
     }
   if(!is(e2, "xlim")){
     args <- as.list(match.call()$e2)
+    ## ## hack for unevaled "..."
+    ## lll <- lapply(args, function(a){
+    ##     if(is.name(a)){
+    ##         return(a == as.name("..."))
+    ##     }else{
+    ##         return(FALSE)
+    ##     }
+    ## })
+    ## args <- args[!unlist(lll)]
     e2name <-  deparse(args[[1]])
     .tmp <- list(args)
     names(.tmp) <- e2name
     e1@cmd <- c(e1@cmd, .tmp)
     ## get data from object
-    if(is.call(e2)){
+    if(!is.null(attr(e2, "call")) && attr(e2, "call")){
+        e2 <- attr(e2, "mc")
         ## args <- as.list(e2)
         if(!is.null(e1@data) & is.null(args$data))
             args$data <- e1@data
+
         object <- do.call(as.character(args[[1]]), args[-1])
+        ## if(inherits(te, "try-error")) browser()
         e1@ggplot <- mapToGG(e1@ggplot, object)
     }else{
       object <- e2
@@ -214,6 +236,8 @@ isStat <- function(x){
 ## search for proto class, the data and mapping
 
 mapToGG <- function(p, object){
+    if(!is.list(object))
+        object <- list(object)
     protos <- returnProto(object)
     if(isStat(object) == TRUE){
       p$mapping <- protos[[1]]$mapping
@@ -226,5 +250,31 @@ returnProto <- function(object){
   rapply(object, function(x) x, "proto", how = "unlist")  
 }
 
+## "+.gg" <- function(e1, e2){
+##     e2name <- deparse(substitute(e2))
+##     if(is.call(e2)){
+##         browser()
+##         e2 <- eval(e2)
+##     }
+##     if      (is.theme(e1))  add_theme(e1, e2, e2name)
+##     else if (is.ggplot(e1)) add_ggplot(e1, e2, e2name)
+## }
+## "%+%" <- `+.gg`
+
+## setMethod("+", c("gg"), function(e1, e2){
+##   e2name <- deparse(substitute(e2))
+##   if(is.call(e2))
+##       e2 <- eval(e2)
+##   if      (is.theme(e1))  add_theme(e1, e2, e2name)
+##   else if (is.ggplot(e1)) add_ggplot(e1, e2, e2name)
+## })
+
+## setMethod("+", c("ggplot"), function(e1, e2){
+##   e2name <- deparse(substitute(e2))
+##   if(is.call(e2))
+##       e2 <- eval(e2)
+##   if      (is.theme(e1))  add_theme(e1, e2, e2name)
+##   else if (is.ggplot(e1)) add_ggplot(e1, e2, e2name)
+## })
 
 

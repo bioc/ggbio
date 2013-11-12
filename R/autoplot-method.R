@@ -9,6 +9,8 @@ formals.facets <- union(formals.facet_grid, formals.facet_wrap)
                  "segment", "arch", "bar")
 .ggbio.stat <- c("identity", "coverage", "stepping", "aggregate", "table",
                  "gene", "mismatch", "reduce", "bin", "slice")
+.ggplot.geom <- c("rect", "segment", "bar")
+.ggplot.stat <- c("identity", "aggregate", "bin")
 
 ## ======================================================================
 ##        For "Granges"
