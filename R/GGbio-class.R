@@ -131,15 +131,6 @@ setMethod("+", c("GGbio"), function(e1, e2){
     }
   if(!is(e2, "xlim")){
     args <- as.list(match.call()$e2)
-    ## ## hack for unevaled "..."
-    ## lll <- lapply(args, function(a){
-    ##     if(is.name(a)){
-    ##         return(a == as.name("..."))
-    ##     }else{
-    ##         return(FALSE)
-    ##     }
-    ## })
-    ## args <- args[!unlist(lll)]
     e2name <-  deparse(args[[1]])
     .tmp <- list(args)
     names(.tmp) <- e2name
@@ -147,12 +138,16 @@ setMethod("+", c("GGbio"), function(e1, e2){
     ## get data from object
     if(!is.null(attr(e2, "call")) && attr(e2, "call")){
         e2 <- attr(e2, "mc")
-        ## args <- as.list(e2)
         if(!is.null(e1@data) & is.null(args$data))
             args$data <- e1@data
 
         object <- do.call(as.character(args[[1]]), args[-1])
-        ## if(inherits(te, "try-error")) browser()
+        e1@ggplot <- mapToGG(e1@ggplot, object)
+    }else if(is.call(e2)){
+        if(!is.null(e1@data) & is.null(args$data))
+            args$data <- e1@data
+
+        object <- do.call(as.character(args[[1]]), args[-1])
         e1@ggplot <- mapToGG(e1@ggplot, object)
     }else{
       object <- e2
