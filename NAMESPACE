@@ -139,7 +139,7 @@ export(tracks,
        plotRangesLinkedToData)
 
 export(theme_null, theme_alignment, theme_clear, theme_tracks_sunset,
-       theme_pack_panels, theme_noexpand, theme_genome)
+       theme_pack_panels, theme_noexpand, theme_genome, nolegend)
 
 export(ggsave)
 exportMethods(cbind, rbind)

@@ -23,8 +23,11 @@ setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
   else
     es <- 0
   
-
+  if(all(c("y","yend", "x", "xend") %in% names(args.aes)))
+      stat <- "identity"
+  
   if(length(data)){
+      
   if(stat == "stepping"){
     grl <- splitByFacets(data, facets)
     res <- endoapply(grl,
@@ -68,17 +71,20 @@ setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
   }
   
   if(stat == "identity"){
-    if(!"y" %in% names(args.aes)){
-      if(!all(c("y","yend", "x", "xend") %in% names(args.aes))){
-        stop("aes(x =, xend= , y =, yend= ) is required for stat 'identity',
+      if(all(c("y","yend", "x", "xend") %in% names(args.aes))){
+          
+      }else{
+          if(!"y" %in% names(args.aes)){
+              stop("aes(x =, xend= , y =, yend= ) is required for stat 'identity',
               you could also specify aes(y =) only as alternative")
+          }else{
+              .y <- args.aes$y
+              args.aes$x <- as.name("start")
+              args.aes$xend <- as.name("end")
+              args.aes$y <- args.aes$yend <- .y
+          }
       }
-    }else{
-      .y <- args.aes$y
-      args.aes$x <- as.name("start")
-      args.aes$xend <- as.name("end")
-      args.aes$y <- args.aes$yend <- .y
-    }
+
     df <- mold(data)
     args.aes <- args.aes[names(args.aes) != "group"]
     args.aes <- args.aes[names(args.aes) != "size"]

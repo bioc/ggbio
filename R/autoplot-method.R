@@ -30,7 +30,7 @@ setMethod("autoplot", "GRanges", function(object, ..., chr,
                                           layout = c("linear", "karyogram", "circle")
                                           ){
 
-
+    .obj <- object
   if(!missing(chr))
     object <- subsetByChrs(object, chr)
   
@@ -160,10 +160,11 @@ setMethod("autoplot", "GRanges", function(object, ..., chr,
       p <- p + scale_by_xlim(getLimits(p)$xlim)
   }
   if(is_coord_genome(object)){
-      sls <- seqlengths(object)
+      sls <- seqlengths(.obj)
       sls <- sum(sls)
-      if(is.na(sls))
-          sls <- max(end(object))
+      if(is.na(sls)){
+          sls <- max(end(.obj))
+      }
       .xlim <- c(1, sls)
       .xlim <- expand_range(.xlim, mul = 0.05)
       p <- p + xlim(.xlim)
