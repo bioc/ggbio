@@ -149,6 +149,15 @@ setMethod("autoplot", "GRanges", function(object, ..., chr,
     ss <- getXScale(object)
     p <- p + scale_x_continuous(breaks = ss$breaks,
                                 labels = ss$labels)
+   if(metadata(object)$x.max < 1e8){
+       sls <- seqlengths(.obj)
+       sls <- sum(sls)
+      if(!is.na(sls)){
+          .xlim <- c(0, sls)
+          p <- p + xlim(.xlim)
+      }
+   }
+
   }
   if(length(stat) && stat != "aggregate")
     p <- p + facet
@@ -159,16 +168,17 @@ setMethod("autoplot", "GRanges", function(object, ..., chr,
   if(!is_coord_truncate_gaps(object) && !is_coord_genome(object)){  
       p <- p + scale_by_xlim(getLimits(p)$xlim)
   }
-  if(is_coord_genome(object)){
-      sls <- seqlengths(.obj)
-      sls <- sum(sls)
-      if(is.na(sls)){
-          sls <- max(end(.obj))
-      }
-      .xlim <- c(1, sls)
-      .xlim <- expand_range(.xlim, mul = 0.05)
-      p <- p + xlim(.xlim)
-  }
+  ## if(is_coord_genome(object)){
+  ##     browser()
+  ##     sls <-  tail(getXScale(object)$breaks, 2)
+  ##     sls <- max(sls) + max(sls)
+  ##     if(is.na(sls)){
+  ##         sls <- max(end(.obj))
+  ##     }
+  ##     .xlim <- c(1, sls)
+  ##     ## .xlim <- expand_range(.xlim, mul = 0.05)
+  ##     p <- p + xlim(.xlim)
+  ## }
   p
 })
 
