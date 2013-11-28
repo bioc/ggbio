@@ -54,8 +54,6 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
   ## reduce plots
   dots <- reduceListOfPlots(dots)
 
-
-  
   ## return plots if not
   dots <- genPlots(dots)
 
@@ -111,6 +109,7 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
   ylim <- lapply(dots[!fixed & !isIdeo & !isBlank], function(grob){
      scales::expand_range(getLimits(grob)$ylim, mul = 0.05)
   })
+  
 
   wh <- NULL
   ## xlim
@@ -250,7 +249,7 @@ setMethod("print", "Tracks", function(x){
                                                        axis.ticks.x = element_blank())
 
                     if(i %in% which(!x@fixed)){
-                      s <- coord_cartesian(xlim = x@xlim)                      
+                      s <- coord_cartesian(xlim = x@xlim)
                       grobs[[i]] <- grobs[[i]] + s
                     }
                     grobs[[i]]
@@ -258,7 +257,7 @@ setMethod("print", "Tracks", function(x){
 
     if(!is.null(nms))
       names(lst) <- nms
-    grid.newpage()    
+    grid.newpage()
     if(any(x@labeled))
       res <- do.call(alignPlots, c(lst, list(heights = x@heights,
                                              padding = x@padding,

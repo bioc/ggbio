@@ -8,6 +8,7 @@
 \alias{autoplot,BSgenome-method}
 \alias{autoplot,GAlignments-method}
 \alias{autoplot,BamFile-method}
+\alias{autoplot,BamFileList-method}
 \alias{autoplot,TranscriptDb-method}
 \alias{autoplot,character-method}
 \alias{autoplot,Rle-method}

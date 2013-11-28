@@ -450,23 +450,24 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
   
 
   if(is_coord_truncate_gaps(gr)){
-    gr <- gr[values(gr)$type %in% c("utr", "cds")]
-    ss <- getXScale(gr)
-    p <- c(p, list(scale_x_continuous(breaks = ss$breaks,
-                                      labels = ss$labels)))
+      gr <- gr[values(gr)$type %in% c("utr", "cds")]
+      ss <- getXScale(gr)
+      p <- c(p, list(scale_x_continuous(breaks = ss$breaks,
+                                        labels = ss$labels)))
   }else{
-    p <- c(p, list(scale_by_xlim(.xlim)))
-    if(!missing(xlim)){
+      if(is.null(.xlim)){
+          if(length(which) && is(which, "GRagnes")){
+              .xlim <- c(start(range(which, ignore.strand = TRUE)),
+                         end(range(which, ignore.strand = TRUE)))
+              p <- c(p, list(scale_by_xlim(.xlim)))      
+          }
+      }else{
+          p <- c(p, list(scale_by_xlim(.xlim)))      
+      }
+      if(missing(xlim)){
+          xlim <- .xlim
+      }
       p <- c(p, list(coord_cartesian(xlim = xlim)))
-    } else if (!is.list(which)) {
-
-      if(!is.null(.xlim))
-        xlim <- expand_range(.xlim, mul = 0.05)
-      else
-        xlim <- c(start(which), end(which))
-      
-      p <- c(p, list(coord_cartesian(xlim = xlim)))
-    }
   }
   p <- setStat(p)  
   p  
@@ -474,7 +475,7 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
 
 
 .transformTextToSpace <- function(x = character(), limits = NULL,
-                                  fixed = 100, size = 1 ){
+                                  fixed = 80, size = 1 ){
   if(!length(limits))
     stop("pleast provide your limits of current viewed coordinate")
   nchar(x) * size / fixed * diff(limits)

@@ -123,7 +123,7 @@ exportMethods(stat_aggregate,
 exportMethods(layout_karyogram,
               layout_circle)
 
-export(circle)
+## export(circle)
 ## coord
 ## exportMethods(coord_genome)
 export(tracks,
@@ -134,7 +134,8 @@ export(tracks,
        plotStackedOverview,
        plotKaryogram,       
        plotSingleChrom,
-       plotIdeogram,       
+       plotIdeogram,
+       Ideogram,
        plotGrandLinear,
        plotRangesLinkedToData)
 
