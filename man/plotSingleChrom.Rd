@@ -6,12 +6,12 @@
 \alias{+,Ideogram,ANY-method}
 \title{Plot single chromosome with cytoband}
 \usage{
-plotSingleChrom(obj, subchr = NULL, zoom.region, xlab, ylab, main, xlabel =
+plotSingleChrom(obj, subchr = NULL, zoom.region = NULL, which = NULL, xlab, ylab, main, xlabel =
                  FALSE, color = "red", fill = "red", alpha = 0.7,
                  zoom.offset = 0.1, size = 1, 
                  cytoband = TRUE, aspect.ratio = 1/20, genome)
 
-plotIdeogram(obj, subchr = NULL, zoom.region, xlab, ylab, main, xlabel =
+plotIdeogram(obj, subchr = NULL, zoom.region = NULL, which = NULL, xlab, ylab, main, xlabel =
                  FALSE, color = "red", fill = "red", alpha = 0.7,
                  zoom.offset = 0.1, size = 1, 
                  cytoband = TRUE, aspect.ratio = 1/20, genome)
@@ -43,6 +43,9 @@ Ideogram(obj, subchr = NULL, xlabel = FALSE, cytoband = TRUE,
   }
   \item{zoom.region}{
     A numeric vector of length 2 indicating zoomed region.
+  }
+  \item{which}{
+    GRanges object or \code{NULL}. 
   }
   \item{xlab}{
     Label for x

@@ -96,6 +96,7 @@ tracks(..., heights, xlim, xlab = NULL, main = NULL,
             scale.height = unit(2, "lines"),
             xlab.height = unit(2, "lines"),
             padding = unit(-1, "lines"),
+            labeled = NULL,
             label.bg.color =  "white",
             label.bg.fill = "gray80",
             label.text.color = "black",
@@ -103,7 +104,8 @@ tracks(..., heights, xlim, xlab = NULL, main = NULL,
             label.width = unit(2.5, "lines"))
 }
 \arguments{
-  \item{...}{plots of class ggplot, generated from ggplot2 or ggbio.}
+  \item{...}{plots generated from ggplot2 or ggbio, or raw object that
+    supported by autoplot.}
   \item{heights}{numeric vector of the same length of passed graphic
     object to indicate the ratio of each track.}
   \item{xlim}{limits on x. could be \code{\linkS4class{IRanges}}, \code{\linkS4class{GRanges}}, \code{numeric} value}
@@ -131,7 +133,12 @@ tracks(..., heights, xlim, xlab = NULL, main = NULL,
   \item{padding}{
     single numeric value or unit, if numeric value, the unit would be
     "lines" by default.
-  }          
+  }
+  \item{labeled}{
+    logical value or \code{NULL}, default is \code{NULL}, parse
+    'labeled' tag from an object, if it is specified by any logical
+    value, it will override the default.
+  }
   \item{label.bg.color}{
     track labeling background rectangle border color.
   }

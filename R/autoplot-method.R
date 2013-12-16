@@ -12,6 +12,12 @@ formals.facets <- union(formals.facet_grid, formals.facet_wrap)
 .ggplot.geom <- c("rect", "segment", "bar")
 .ggplot.stat <- c("identity", "bin")
 
+.autoplot.obj <- c("BamFile", "BamFileList", "BSgenome", "character", "ExpressionSet", 
+                   "GAlignments", "GRanges", "GRangesList", "IRanges", "matrix",
+                   "Rle", "RleList", "Seqinfo", "SummarizedExperiment", "TranscriptDb",
+                   "VCF", "Views")
+
+
 ## ======================================================================
 ##        For "Granges"
 ## ======================================================================
@@ -30,6 +36,12 @@ setMethod("autoplot", "GRanges", function(object, ..., chr,
                                           layout = c("linear", "karyogram", "circle")
                                           ){
 
+    ## browser()
+    ## args <- as.list(match.call()$e2)
+    ## e2name <-  deparse(args[[1]])
+    ## .tmp <- list(args)
+    ## names(.tmp) <- e2name
+    
     .obj <- object
   if(!missing(chr))
     object <- subsetByChrs(object, chr)
@@ -168,17 +180,6 @@ setMethod("autoplot", "GRanges", function(object, ..., chr,
   if(!is_coord_truncate_gaps(object) && !is_coord_genome(object)){  
       p <- p + scale_by_xlim(getLimits(p)$xlim)
   }
-  ## if(is_coord_genome(object)){
-  ##     browser()
-  ##     sls <-  tail(getXScale(object)$breaks, 2)
-  ##     sls <- max(sls) + max(sls)
-  ##     if(is.na(sls)){
-  ##         sls <- max(end(.obj))
-  ##     }
-  ##     .xlim <- c(1, sls)
-  ##     ## .xlim <- expand_range(.xlim, mul = 0.05)
-  ##     p <- p + xlim(.xlim)
-  ## }
   p
 })
 

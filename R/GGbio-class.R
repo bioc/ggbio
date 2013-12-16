@@ -15,7 +15,9 @@ GGbio <- function(ggplot = NULL, data = NULL, fetchable = FALSE, blank = FALSE,.
     if(is(ggplot, "GGbio")){
         ggplot <- ggplot@ggplot
     }
-    new("GGbio", ggplot = ggplot, data = data, fetchable = fetchable, blank = blank, ...)        
+    obj <- new("GGbio", ggplot = ggplot, data = data, fetchable = fetchable, blank = blank, ...)
+    obj <- copyAttr(ggplot, obj)
+    obj
 }
 ## alias
 ggbio <- GGbio
@@ -160,7 +162,15 @@ setMethod("+", c("GGbio"), function(e1, e2){
     return(e1)
   }else{
     if(!e1@fetchable){
-      e1@ggplot <- e1@ggplot + e2
+        e1@ggplot <- e1@ggplot + e2        
+        ## .ori <- attr(e2, "ori")
+        ## if(is(e1@data, "GRanges") && is(.ori, "GRanges")){
+        ##     message("run")
+        ##     e1@data <- .shrinkGr(subsetByOverlaps(e1@data, .ori))
+        ##     e1 <-eval(e1@cmd[[1]])            
+        ## }else{
+        ##     e1@ggplot <- e1@ggplot + e2
+        ## }
     }else{
       grl <- cached_which(e1)
       if(length(grl)){

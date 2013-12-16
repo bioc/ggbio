@@ -35,6 +35,7 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
                    scale.height = unit(2, "lines"),
                    xlab.height = unit(2, "lines"),
                    padding = unit(-1, "lines"),
+                   labeled = NULL,
                    label.bg.color =  "white",
                    label.bg.fill = "gray80",
                    label.text.color = "black",
@@ -54,6 +55,9 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
   ## reduce plots
   dots <- reduceListOfPlots(dots)
 
+  ## names
+  nms <- names(dots)
+  
   ## return plots if not
   dots <- genPlots(dots)
 
@@ -85,8 +89,29 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
     heights <- parseHeight(heights, length(dots))
   }
 
-  ## labeld
-  labeled <- sapply(dots, labeled)
+  ## labeled
+  ## .labeled <- .labeled
+  if(is.null(labeled)){
+      ## all FALSE
+      labeled <- sapply(dots, labeled)
+      ## when no list name
+      idx.nms <- sapply(nms, nchar) > 0
+      ## when there is list name, force it to be TRUE
+      if(length(idx.nms)){
+          labeled[idx.nms] <- TRUE
+      }
+  }else{
+      ## overwrite default behavior
+      if(length(labeled) == 1 && is(labeled, "logical")){
+          labeled <- rep(labeled, length(dots))
+      }else if(length(labeled) == length(dots) &&
+               all(sapply(labeled, function(x) { is(x, "logical")}))){
+          labeled <- labeled
+      }else{
+          stop("labeled parameter must be NULL, single logical value or logical vector with length euqal to plots")
+      }
+  }
+
 
   ## Ideo
   isIdeo <- sapply(dots, is, "Ideogram")
@@ -261,6 +286,7 @@ setMethod("print", "Tracks", function(x){
     if(any(x@labeled))
       res <- do.call(alignPlots, c(lst, list(heights = x@heights,
                                              padding = x@padding,
+                                             labeled = x@labeled,                                             
                                              label.bg.color =  x@label.bg.color,
                                              label.bg.fill = x@label.bg.fill,
                                              label.text.color = x@label.text.color,
@@ -278,6 +304,7 @@ setMethod("print", "Tracks", function(x){
     else
       res <- do.call(alignPlots, c(lst, list(heights = x@heights,
                                              padding = x@padding,
+                                             labeled = x@labeled,                                             
                                              track.plot.color = x@track.plot.color,
                                              track.bg.color = x@track.bg.color,
                                              add.scale = TRUE,
@@ -324,6 +351,7 @@ setMethod("get_gtable", "Tracks", function(x){
     if(any(x@labeled))
       res <- do.call(alignPlots, c(lst, list(heights = x@heights,
                                              padding = x@padding,
+                                             labeled = x@labeled,
                                              label.bg.color =  x@label.bg.color,
                                              label.bg.fill = x@label.bg.fill,
                                              label.text.color = x@label.text.color,
@@ -343,6 +371,7 @@ setMethod("get_gtable", "Tracks", function(x){
                                              padding = x@padding,
                                              track.plot.color = x@track.plot.color,
                                              track.bg.color = x@track.bg.color,
+                                             labeled = x@labeled,                                             
                                              add.scale = TRUE,
                                              main = x@main,
                                              xlab = x@xlab,
@@ -456,13 +485,19 @@ setMethod("xlim", "IRanges", function(obj, ...){
 })
 
 setMethod("xlim", "GRanges", function(obj, ...){
-  xlim <- c(start(ranges(reduce(obj, ignore.strand = TRUE))),
-            end(ranges(reduce(obj, ignore.strand = TRUE))))
-  res <- ggplot2::coord_cartesian(xlim = xlim)
-  chr <- unique(as.character(seqnames(obj)))
-  attr(res, "chr") <- chr
-  attr(res, "ori") <- obj
-  xlim_car(res)
+    .obj <- obj
+    .obj <- .shrinkGr(.obj)
+    if(length(obj) > 1){
+        obj <- obj[1]
+    }
+    xlim <- c(start(ranges(reduce(obj, ignore.strand = TRUE))),
+              end(ranges(reduce(obj, ignore.strand = TRUE))))
+    res <- ggplot2::coord_cartesian(xlim = xlim)
+    chr <- unique(as.character(seqnames(obj)))
+    attr(res, "chr") <- chr
+    attr(res, "ori") <- .obj
+    res <- xlim_car(res)
+    res
 })
 
 setMethod("xlim", "Tracks", function(obj, ...){
@@ -539,7 +574,8 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
                        heights = NULL, height = NULL, width = NULL,
                        padding = NULL, 
                        track.plot.color = NULL,
-                       track.bg.color = NULL,                                             
+                       track.bg.color = NULL,
+                       labeled = NULL,
                        label.bg.color =  "white",
                        label.bg.fill = "gray80",
                        label.text.color = "black",
@@ -579,6 +615,12 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
   label.name <- names(ggl)
   N <- length(ggl)
   
+  lbs <- labeled
+  if(is.null(labeled)){
+      lbs <- sapply(ggl, labeled)
+  }
+ 
+  
   if(length(track.plot.color) == 1){
       track.plot.color <- rep(track.plot.color, N)
   }
@@ -603,7 +645,6 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
                        label.width = unit(2.5, "lines"),
                        direction = c("row", "col")
                        ){
-
     if(length(label.text.color) == 1)
         label.text.color <- rep(label.text.color, len = length(grobs))
     if(length(label.text.cex) == 1)    
@@ -619,20 +660,20 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
       res <- lapply(1:length(grobs), function(i){
         grob <- grobs[[i]]
         if(lbs[i]){
-          rect <- rectGrob(gp = gpar(fill = label.bg.fill[i],
-                             col = label.bg.color[i]))
-          label <- textGrob(nms[i], rot = 90, 
-                            gp = gpar(col = label.text.color[i],
-                              cex = label.text.cex[i]))
-          left.grob <- grobTree(gTree(children = gList(rect, label)))
+            rect <- rectGrob(gp = gpar(fill = label.bg.fill[i],
+                                 col = label.bg.color[i]))
+            label <- textGrob(nms[i], rot = 90, 
+                              gp = gpar(col = label.text.color[i],
+                                  cex = label.text.cex[i]))
+            left.grob <- grobTree(gTree(children = gList(rect, label)))
         }else{
-          left.grob <- ggplot2:::zeroGrob()
+            left.grob <- ggplot2:::zeroGrob()
         }
         gt <- gtable(width = unit.c(label.width,unit(1, "null")),
                      height = unit(1, "null"))
         gt <- gtable_add_grob(gt, left.grob,l = 1, t = 1)      
         gt <- gtable_add_grob(gt, grob, l = 2, t =1 )
-      })
+    })
     }else{
       res <- lapply(1:length(grobs), function(i){
         if(lbs[i]){
@@ -652,6 +693,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
         gt <- gtable_add_grob(gt, grob, l = 1, t =2 )
       })
     }
+    res
   }
 
   if(vertical)
@@ -689,35 +731,56 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
   }
   
   if(add.scale){
-    g <- g.last$grobs[[1]]$children[[1]]$children$layout
-    g.s <- scaleGrob(g)
-    if(length(track.bg.color)){
-        rect.grob <- rectGrob(gp=gpar(col = track.bg.color,
-                                fill = track.bg.color))
-        g.s <- grobTree(gTree(children = gList(rect.grob, g.s)))
+      g <- g.last$grobs[[1]]$children[[1]]$children$layout
+      g.s <- scaleGrob(g)
+      if(length(track.bg.color)){
+          rect.grob <- rectGrob(gp=gpar(col = track.bg.color,
+                                    fill = track.bg.color))
+          g.s <- grobTree(gTree(children = gList(rect.grob, g.s)))
       }
-    grobs <- c(grobs, list(g.s))
-    if(length(main)){
+      grobs <- c(grobs, list(g.s))
+      label.name <- c(label.name, "")
+      lbs <- c(lbs, FALSE)
+      label.bg.color <-  c(label.bg.color, NA)
+      label.bg.fill <- c(label.bg.fill, NA)
+      label.text.color <- c(label.text.color, NA)
+      label.text.cex <- c(label.text.cex, NA)                  
+  }
+  
+  if(length(main)){
+      ## adding title
       text.grob <- textGrob(main)
       if(length(track.bg.color)){
-        rect.grob <- rectGrob(gp=gpar(col = track.bg.color, fill = track.bg.color))
-        text.grob <- grobTree(gTree(children = gList(rect.grob, text.grob)))
+          rect.grob <- rectGrob(gp=gpar(col = track.bg.color, fill = track.bg.color))
+          text.grob <- grobTree(gTree(children = gList(rect.grob, text.grob)))
       }
-    grobs <- c(list(text.grob), grobs)      
-    }
-    if(length(xlab)){
+      grobs <- c(list(text.grob), grobs)
+      label.name <- c("", label.name)
+      lbs <- c(FALSE, lbs)
+      label.bg.color <-  c(NA, label.bg.color)
+      label.bg.fill <- c(NA, label.bg.fill)
+      label.text.color <- c(NA, label.text.color)
+      label.text.cex <- c(NA, label.text.cex)                  
+      
+  }
+  if(length(xlab)){
       text.grob <- textGrob(xlab)      
       if(length(track.bg.color)){
-        rect.grob <- rectGrob(gp=gpar(col = track.bg.color, fill = track.bg.color))
-        text.grob <- grobTree(gTree(children = gList(rect.grob, text.grob)))
+          rect.grob <- rectGrob(gp=gpar(col = track.bg.color, fill = track.bg.color))
+          text.grob <- grobTree(gTree(children = gList(rect.grob, text.grob)))
+
       }
       grobs <- c(grobs, list(text.grob))
-    }
+      label.name <- c(label.name, "")
+      lbs <- c(lbs, FALSE)
+      label.bg.color <-  c(label.bg.color, NA)
+      label.bg.fill <- c(label.bg.fill, NA)
+      label.text.color <- c(label.text.color, NA)
+      label.text.cex <- c(label.text.cex, NA)                  
+      
   }
 
-  ## FIXME:
-  lbs <- sapply(grobs, labeled)
- ## nms <- names(grobs)
+
   nms <- label.name
 
   if(any(remove.y.axis)){

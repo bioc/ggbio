@@ -671,10 +671,11 @@ plotInter2 <- function(data, fig.h, save = FALSE){
 
 ## from x1 object to x2 object
 copyAttr <- function(x1, x2){
-  attrs <- attributes(x1)
-  attrs <- attrs[setdiff(names(attrs), c("class", "names"))]
-  attrs <- c(attrs, attributes(x2))
-  attributes(x2) <- attrs
+  attrs1 <- attributes(x1)
+  attrs2 <- attributes(x2)  
+  attrs1 <- attrs1[setdiff(names(attrs1), names(attrs2))]
+  attrs2 <- c(attrs1, attrs2)
+  attributes(x2) <- attrs2
   x2
 }
 
@@ -684,3 +685,7 @@ nolegend <- function(){
     theme(legend.position="none")
 }
 
+
+.shrinkGr <- function(x){
+    keepSeqlevels(x, as.character(unique(seqnames(x))))    
+}
