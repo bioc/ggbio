@@ -170,6 +170,49 @@ class(p)
 is
 
 ## 
+library(ggbio)
+library(ggplot2)
+library(GenomicRanges)
+
+gr = GRanges("1",
+             IRanges(1:5, 1:5))
+
+set.seed(1)
+gr$e = runif(5)
+gr$l = runif(5, -1, 0)
+gr$u = runif(5, 1, 2)
+
+p = autoplot(gr, geom = "pointrange", aes_string(y = "e", ymin = "l", ymax = "u"))
+
+t = tracks(p, p, p)
+t
+t = tracks(p, p, p, title = "title")
+t
+t = tracks(p, p, p, title = "") 
+t
+t = tracks(p1 = p, p2 = p, p3 = p, title = "title", xlab = "xlab")
+print(t)
+
+df1 <- data.frame(time = 1:100, score = sin((1:100)/20)10)
+p1 <- qplot(data = df1, x = time, y = score, geom = "line")
+df2 <- data.frame(time = 30:120, score = sin((30:120)/20)10, value = rnorm(120-30 + 1))
+p2 <- ggplot(data = df2, aes(x = time, y = score)) + 
+  geom_line() + geom_point(size = 4, aes(color = value))
+
+plot two tracks with a label - this looks OK
+
+tracks (p1, p2, main="myTitle")
+
+plot two labelled tracks - this look OK
+
+tracks (p1=p1, p2=p2)
+
+adding title to the plot with labelled tracks messes up alignment of the labels with the plot
+
+tracks (p1=p1, p2=p2, main="myTitle")
+
+
+
 
 
 

@@ -31,9 +31,9 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
                    theme = NULL, 
                    track.plot.color = NULL,
                    track.bg.color = NULL,
-                   main.height = unit(2, "lines"),
-                   scale.height = unit(2, "lines"),
-                   xlab.height = unit(2, "lines"),
+                   main.height = unit(1.5, "lines"),
+                   scale.height = unit(1, "lines"),
+                   xlab.height = unit(1.5, "lines"),
                    padding = unit(-1, "lines"),
                    labeled = NULL,
                    label.bg.color =  "white",
@@ -46,6 +46,17 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
   
   if(is.numeric(padding) && !is.unit(padding))
     padding <- unit(padding, "lines")
+  
+  if(is.numeric(main.height) && !is.unit(main.height))
+    main.height <- unit(main.height, "lines")
+  
+  if(is.numeric(scale.height) && !is.unit(scale.height))
+    scale.height <- unit(scale.height, "lines")
+  
+  if(is.numeric(xlab.height) && !is.unit(xlab.height))
+    xlab.height <- unit(xlab.height, "lines")
+  
+  
   
   if(!is.null(title) && is.null(main))
     main <- title
@@ -120,14 +131,14 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
   isBlank <- sapply(dots, function(x) x@blank)
 
 
-  if(length(label.text.color) == 1)
-      label.text.color <- rep(label.text.color, len = length(dots))
-  if(length(label.text.cex) == 1)    
-      label.text.cex <- rep(label.text.cex, len = length(dots))
-  if(length(label.bg.color) == 1)        
-      label.bg.color <- rep(label.bg.color, len = length(dots))
-  if(length(label.bg.fill) == 1)            
-      label.bg.fill <- rep(label.bg.fill, len = length(dots))
+#   if(length(label.text.color) == 1)
+#       label.text.color <- rep(label.text.color, len = length(dots))
+#   if(length(label.text.cex) == 1)    
+#       label.text.cex <- rep(label.text.cex, len = length(dots))
+#   if(length(label.bg.color) == 1)        
+#       label.bg.color <- rep(label.bg.color, len = length(dots))
+#   if(length(label.bg.fill) == 1)            
+#       label.bg.fill <- rep(label.bg.fill, len = length(dots))
 
 
   ## ylim
@@ -262,13 +273,13 @@ setMethod("print", "Tracks", function(x){
                     if(i %in% which(x@mutable))
                       grobs[[i]] <- grobs[[i]] + x@theme
                     grobs[[i]] <- grobs[[i]] + ggplot2::xlab("")  + labs(title = "")
-                    if(i == 1){
-                      grobs[[i]] <- grobs[[i]] + theme(plot.margin = unit(c(1, 1,
-                              as.numeric(x@padding),  0.5), "lines"))
-                    }else{
+#                     if(i == 1){
+#                       grobs[[i]] <- grobs[[i]] + theme(plot.margin = unit(c(1, 1,
+#                               as.numeric(x@padding),  0.5), "lines"))
+#                     }else{
                       grobs[[i]] <- grobs[[i]] + theme(plot.margin = unit(c(as.numeric(x@padding), 1,
                               as.numeric(x@padding),  0.5), "lines"))
-                    }
+#                     }
                     if(i %in% which(!x@hasAxis))
                       grobs[[i]] <- grobs[[i]] + theme(axis.text.x = element_blank(),
                                                        axis.ticks.x = element_blank())
@@ -294,7 +305,7 @@ setMethod("print", "Tracks", function(x){
                                              label.width = x@label.width,
                                              track.plot.color = x@track.plot.color,
                                              track.bg.color = x@track.bg.color,
-                                             add.scale = TRUE,
+                                             #add.scale = TRUE,
                                              main = x@main,
                                              xlab = x@xlab,
                                              main.height = x@main.height,
@@ -307,7 +318,7 @@ setMethod("print", "Tracks", function(x){
                                              labeled = x@labeled,                                             
                                              track.plot.color = x@track.plot.color,
                                              track.bg.color = x@track.bg.color,
-                                             add.scale = TRUE,
+                                             #add.scale = TRUE,
                                              main = x@main,
                                              xlab = x@xlab,
                                              main.height = x@main.height,
@@ -359,7 +370,7 @@ setMethod("get_gtable", "Tracks", function(x){
                                              label.width = x@label.width,
                                              track.plot.color = x@track.plot.color,
                                              track.bg.color = x@track.bg.color,
-                                             add.scale = TRUE,
+                                            # add.scale = TRUE,
                                              main = x@main,
                                              xlab = x@xlab,
                                              main.height = x@main.height,
@@ -372,7 +383,7 @@ setMethod("get_gtable", "Tracks", function(x){
                                              track.plot.color = x@track.plot.color,
                                              track.bg.color = x@track.bg.color,
                                              labeled = x@labeled,                                             
-                                             add.scale = TRUE,
+                                           #  add.scale = TRUE,
                                              main = x@main,
                                              xlab = x@xlab,
                                              main.height = x@main.height,
@@ -581,7 +592,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
                        label.text.color = "black",
                        label.text.cex = 1,                   
                        label.width = unit(2.5, "lines"),
-                       add.scale = FALSE,
+                       #add.scale = FALSE,
                        main.height = unit(2, "lines"),
                        scale.height = unit(2, "lines"),
                        xlab.height = unit(2, "lines"),
@@ -626,7 +637,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
   }
 
   ## add a plot with axis and remove later
-  if(add.scale){
+  if(TRUE){
     idx.fix <- which(!sapply(ggl, fixed) & !sapply(ggl, is, "Ideogram"))[1]
     if(is.na(idx.fix))
       idx.fix <- 1
@@ -725,12 +736,12 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
   })
 
   names(grobs) <- .nms
-  if(add.scale){
+  if(TRUE){
     g.last <- grobs[[length(grobs)]]
     grobs <- grobs[-length(grobs)]
   }
   
-  if(add.scale){
+  if(TRUE){
       g <- g.last$grobs[[1]]$children[[1]]$children$layout
       g.s <- scaleGrob(g)
       if(length(track.bg.color)){
@@ -739,12 +750,12 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
           g.s <- grobTree(gTree(children = gList(rect.grob, g.s)))
       }
       grobs <- c(grobs, list(g.s))
-      label.name <- c(label.name, "")
-      lbs <- c(lbs, FALSE)
-      label.bg.color <-  c(label.bg.color, NA)
-      label.bg.fill <- c(label.bg.fill, NA)
-      label.text.color <- c(label.text.color, NA)
-      label.text.cex <- c(label.text.cex, NA)                  
+#       label.name <- c(label.name, "")
+#       lbs <- c(lbs, FALSE)
+#       label.bg.color <-  c(label.bg.color, NA)
+#       label.bg.fill <- c(label.bg.fill, NA)
+#       label.text.color <- c(label.text.color, NA)
+#       label.text.cex <- c(label.text.cex, NA)                  
   }
   
   if(length(main)){
@@ -755,13 +766,13 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
           text.grob <- grobTree(gTree(children = gList(rect.grob, text.grob)))
       }
       grobs <- c(list(text.grob), grobs)
-      label.name <- c("", label.name)
-      lbs <- c(FALSE, lbs)
-      label.bg.color <-  c(NA, label.bg.color)
-      label.bg.fill <- c(NA, label.bg.fill)
-      label.text.color <- c(NA, label.text.color)
-      label.text.cex <- c(NA, label.text.cex)                  
-      
+#       label.name <- c("", label.name)
+#       lbs <- c(FALSE, lbs)
+#       label.bg.color <-  c(NA, label.bg.color)
+#       label.bg.fill <- c(NA, label.bg.fill)
+#       label.text.color <- c(NA, label.text.color)
+#       label.text.cex <- c(NA, label.text.cex)                  
+#       
   }
   if(length(xlab)){
       text.grob <- textGrob(xlab)      
@@ -771,17 +782,17 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
 
       }
       grobs <- c(grobs, list(text.grob))
-      label.name <- c(label.name, "")
-      lbs <- c(lbs, FALSE)
-      label.bg.color <-  c(label.bg.color, NA)
-      label.bg.fill <- c(label.bg.fill, NA)
-      label.text.color <- c(label.text.color, NA)
-      label.text.cex <- c(label.text.cex, NA)                  
+#       label.name <- c(label.name, "")
+#       lbs <- c(lbs, FALSE)
+#       label.bg.color <-  c(label.bg.color, NA)
+#       label.bg.fill <- c(label.bg.fill, NA)
+#       label.text.color <- c(label.text.color, NA)
+#       label.text.cex <- c(label.text.cex, NA)                  
       
   }
 
 
-  nms <- label.name
+ 
 
   if(any(remove.y.axis)){
     for(i in which(remove.y.axis))
@@ -792,6 +803,9 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
       grobs[[i]] <- removeXAxis(grobs[[i]])
   }
 
+  lbs <- sapply(grobs, labeled)
+  nms <- names(lbs)
+  
   ## add lables
   if(vertical){
     if(any(!is.null(nms)))
@@ -842,7 +856,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
     ## TODO check main later
     if(length(main))
       heights <- unit.c(main.height, heights)
-    if(add.scale)    
+    if(TRUE)    
       heights <- unit.c(heights, scale.height)
     if(length(xlab))
       heights <- unit.c(heights, xlab.height)
@@ -1020,7 +1034,7 @@ ScalePlot <- function(x, color = "black", fill = NA){
 ## always comes last
 
 scaleGrob <- function(g){
-  idx <- g$layout$name %in% c("axis-b", "xlab")
+  idx <- g$layout$name %in% c("axis-b")
   idx <- unique(c(g$layout[idx, "t"], g$layout[idx, "b"]))
   res <- g[idx,]
   res

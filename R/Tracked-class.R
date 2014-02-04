@@ -2,11 +2,11 @@
 setClass("Tracked", slots = c(mutable = "logical", fixed = "logical",
                       labeled = "logical", hasAxis = "logical",
                       bgColor = "character", height = "numericORunit"),
-         prototype = list(mutable = TRUE, fixed = FALSE, labeled = FALSE,
+         prototype = list(mutable = TRUE, fixed = FALSE, labeled = TRUE,
            hasAxis = FALSE, bgColor = "white", height = unit(1, "null")))
 
 
-Tracked <- function(mutable = TRUE, fixed = FALSE, labeled = FALSE,
+Tracked <- function(mutable = TRUE, fixed = FALSE, labeled = TRUE,
                     hasAxis = FALSE, bgColor = "white", height = unit(1, "null")){
   new("Tracked", mutable = mutable, fixed = fixed, labeled = labeled,
       hasAxis = hasAxis, bgColor = bgColor, height = height)
@@ -122,7 +122,7 @@ setReplaceMethod("labeled", c("Ideogram", "logical"), function(x, value){
 setMethod("labeled", "gtable", function(x){
   bg <- attr(x, "labeled")
   if(is.null(bg))
-    return(FALSE)
+    return(TRUE)
   else
     return(bg)
 })
@@ -135,7 +135,7 @@ setReplaceMethod("labeled", c("gtable", "logical"), function(x, value){
 setMethod("labeled", "gg", function(x){
   bg <- attr(x, "labeled")
   if(is.null(bg))
-    return(FALSE)
+    return(TRUE)
   else
     return(bg)
 })
@@ -148,7 +148,7 @@ setReplaceMethod("labeled", c("gg", "logical"), function(x, value){
 setMethod("labeled", "GGbio", function(x){
   bg <- attr(x, "labeled")
   if(is.null(bg))
-    return(FALSE)
+    return(TRUE)
   else
     return(bg)
 })
@@ -164,7 +164,7 @@ setOldClass("text")
 setMethod("labeled", "text", function(x){
   bg <- attr(x, "labeled")
   if(is.null(bg))
-    return(FALSE)
+    return(TRUE)
   else
     return(bg)
 })
@@ -172,7 +172,7 @@ setMethod("labeled", "text", function(x){
 setMethod("labeled", "gTree", function(x){
   bg <- attr(x, "labeled")
   if(is.null(bg))
-    return(FALSE)
+    return(TRUE)
   else
     return(bg)
 })
