@@ -25,7 +25,9 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
   if(!length(facets))
     facets <- as.formula(~seqnames)
   facets <- strip_formula_dots(facets)
-  allvars <- all.vars(as.formula(facets))
+  ## need to get variables from all mapping not just facet
+  allvars <- unique(c(all.vars(as.formula(facets)), as.character(args.aes)))
+  ## getting variables need to be kept for aesthetic mapping
   allvars.extra <- allvars[!allvars %in% c(".", "seqnames", "strand")]
   lst <- lapply(grl, function(dt){
     vals <- coverage(keepSeqlevels(dt, unique(as.character(seqnames(dt)))))
@@ -64,8 +66,10 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
                           as.character(seqnames(dt))[1])
 
     }
-    res[,allvars.extra] <- rep(unique(values(dt)[, allvars.extra]),
-                               nrow(res))
+    for(v in allvars.extra){
+      res[,v] <- rep(unique(values(dt)[, v]), nrow(res))
+    }
+  
     res
   })
   res <- do.call(rbind, lst)
