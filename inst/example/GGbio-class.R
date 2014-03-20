@@ -211,6 +211,43 @@ adding title to the plot with labelled tracks messes up alignment of the labels 
 
 tracks (p1=p1, p2=p2, main="myTitle")
 
+##
+library(ggbio)
+## ======================================================================
+##  simmulated GRanges
+## ======================================================================
+set.seed(1)
+N <- 1000
+library(GenomicRanges)
+
+gr <- GRanges(seqnames = 
+                sample(c("chr1", "chr2", "chr3"),
+                       size = N, replace = TRUE),
+              IRanges(
+                start = sample(1:300, size = N, replace = TRUE),
+                width = sample(70:75, size = N,replace = TRUE)),
+              strand = sample(c("+", "-", "*"), size = N, 
+                              replace = TRUE),
+              value = rnorm(N, 10, 3), score = rnorm(N, 100, 30),
+              sample = sample(c("Normal", "Tumor"), 
+                              size = N, replace = TRUE),
+              pair = sample(letters, size = N, 
+                            replace = TRUE))
+
+ggplot(gr) + stat_coverage()
+ggplot() + stat_coverage(gr)
+
+ggplot(gr) + stat_coverage(geom = "point")
+ggplot(gr) + stat_coverage(geom = "area")
+
+debug(stat_coverage)
+ggplot(gr) + stat_coverage(aes(y = ..coverage..), geom = "histogram")
+
+ggplot(gr) + stat_coverage(aes(y = ..coverage..)) + geom_point()
+
+## for bam file
+## TBD
+
 
 
 
