@@ -28,8 +28,9 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
   ## need to get variables from all mapping not just facet
   allvars <- unique(c(all.vars(as.formula(facets)), as.character(args.aes)))
   ## getting variables need to be kept for aesthetic mapping
-  allvars.extra <- allvars[!allvars %in% c(".", "seqnames", "strand")]
+  allvars.extra <- allvars[!allvars %in% c(".", "seqnames", "strand", "coverage")]
   lst <- lapply(grl, function(dt){
+    dt <- grl[[1]]
     vals <- coverage(keepSeqlevels(dt, unique(as.character(seqnames(dt)))))
     if(any(is.na(seqlengths(dt)))){
       seqs <- xlim[1]:max(end(dt))
@@ -45,8 +46,6 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
     if(geom == "area" | geom == "polygon"){
       seqs <- c(seqs, rev(seqs))
       vals <- c(vals, rep(0, length(vals)))
-      ## .df <- data.frame(x = seqs, y = vals)
-      ## qplot(data = .df, x = x, y = y, geom = "polygon")
 
     }
     if(length(unique(values(dt)$.id.name))){                
