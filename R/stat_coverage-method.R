@@ -3,7 +3,7 @@ setGeneric("stat_coverage", function(data, ...) standardGeneric("stat_coverage")
 
 setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
                                                xlab, ylab, main,
-                                               facets = NULL, 
+                                               facets = NULL,
                                                geom = NULL){
 
 
@@ -30,25 +30,24 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
   ## getting variables need to be kept for aesthetic mapping
   allvars.extra <- allvars[!allvars %in% c(".", "seqnames", "strand", "coverage")]
   lst <- lapply(grl, function(dt){
-    dt <- grl[[1]]
     vals <- coverage(keepSeqlevels(dt, unique(as.character(seqnames(dt)))))
     if(any(is.na(seqlengths(dt)))){
       seqs <- xlim[1]:max(end(dt))
       vals <- vals[[1]][seqs]
-      vals <- as.numeric(vals)                           
+      vals <- as.numeric(vals)
       vals <- c(vals, rep(0, xlim[2]-max(end(dt))))
       seqs <- xlim[1]:xlim[2]
     }else{
       seqs <- xlim[1]:xlim[2]
       vals <- vals[[1]][seqs]
-      vals <- as.numeric(vals)                           
+      vals <- as.numeric(vals)
     }
     if(geom == "area" | geom == "polygon"){
       seqs <- c(seqs, rev(seqs))
       vals <- c(vals, rep(0, length(vals)))
 
     }
-    if(length(unique(values(dt)$.id.name))){                
+    if(length(unique(values(dt)$.id.name))){
       res <- data.frame(coverage = vals, seqs = seqs,
                         seqnames =
                         as.character(seqnames(dt))[1],
@@ -68,13 +67,13 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
     for(v in allvars.extra){
       res[,v] <- rep(unique(values(dt)[, v]), nrow(res))
     }
-  
+
     res
   })
   res <- do.call(rbind, lst)
   if(!"y"  %in% names(args.aes))
     args.aes$y <- as.name("coverage")
-  
+
   if(!"x"  %in% names(args.aes))
     args.aes$x <- as.name("seqs")
 
@@ -91,7 +90,7 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
 
   p <- .changeStrandColor(p, args.aes)
   p <- c(list(p) , list(facet))
-  if(missing(xlab)) 
+  if(missing(xlab))
     xlab <- ""
   p <- c(p, list(ggplot2::xlab(xlab)))
 
@@ -103,14 +102,14 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
   if(!missing(main))
     p <- c(p, list(labs(title = main)))
 
-  p <- setStat(p)    
+  p <- setStat(p)
   p
 })
 
 
 setMethod("stat_coverage", "GRangesList", function(data, ..., xlim,
                                                    xlab, ylab, main,
-                                                   facets = NULL, 
+                                                   facets = NULL,
                                                geom = NULL){
   args <- list(...)
   args$facets <- facets
@@ -136,7 +135,7 @@ setMethod("stat_coverage", "GRangesList", function(data, ..., xlim,
   if(!missing(main))
     p <- c(p, list(labs(title = main)))
 
-  p <- setStat(p)    
+  p <- setStat(p)
   p
 })
 
@@ -144,13 +143,13 @@ setMethod("stat_coverage", "GRangesList", function(data, ..., xlim,
 setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xlim,
                                                which,
                                                xlab, ylab, main,
-                                               facets = NULL, 
+                                               facets = NULL,
                                                geom = NULL,
                                                method = c("estimate", "raw"),
                                                space.skip = 0.1,
                                                coord = c("linear", "genome")){
 
-  coord <- match.arg(coord)  
+  coord <- match.arg(coord)
   if(missing(which)){
       ## stop("missing which is not supported yet")
       p <- c(list(geom_blank()),list(ggplot2::ylim(c(0, 1))),
@@ -185,8 +184,8 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
   }
   args.non <- parseArgsForNonAes(args)
   args.non <- args.non[!names(args.non) %in% c("method", "maxBinSize", "data", "which")]
-  
-  
+
+
   if(is.null(geom))
     geom <- "line"
   args.non$geom <- geom
@@ -207,7 +206,7 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
                   res <- crunch(data, which = which)
                 })
   res.ori <- res
-  
+
   if(method == "estimate"){
   message("Constructing graphics...")
   res <- res[seqnames(res) %in% seq.nm]
@@ -221,7 +220,7 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
     res <- transformToGenome(res, space.skip = space.skip)
     res.ori <- res <- biovizBase:::rescaleGr(res)
   }
-  
+
   if(geom == "area"){
     grl <- splitByFacets(res, facets)
     res <- endoapply(grl, function(gr){
@@ -230,7 +229,7 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
       values(.gr1)$score <- 0
       .grn <- gr[length(gr)]
       values(.grn)$score <- 0
-      c(gr,.gr1, .grn) 
+      c(gr,.gr1, .grn)
     })
     res <- unlist(res)
   }
@@ -267,7 +266,7 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
     facet <- facet_null()
     p <- c(p, list(facet))
   }
-  p <- setStat(p)  
+  p <- setStat(p)
   p
-  
+
 })
