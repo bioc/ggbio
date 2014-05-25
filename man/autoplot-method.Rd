@@ -895,7 +895,7 @@ autoplot(eset, type = "boxplot")
 
 ## scatterplot.matrix
 ## slow, be carefull
-autoplot(eset[, 1:7], type = "scatterplot.matrix")
+## autoplot(eset[, 1:7], type = "scatterplot.matrix")
 
 ## mean-sd
 autoplot(eset, type = "mean-sd")
@@ -937,7 +937,7 @@ autoplot(sset, type = "boxplot")
 ###################################################
 ### scatterplot matrix
 ###################################################
-autoplot(sset, type = "scatterplot.matrix")
+## autoplot(sset, type = "scatterplot.matrix")
 
 
 ###################################################
