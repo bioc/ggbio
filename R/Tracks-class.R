@@ -242,6 +242,7 @@ setMethod("summary", "Tracks", function(object){
 setMethod("print", "Tracks", function(x){
     grobs <- x@grobs
     N <- length(grobs)
+   .scale.grob <- grobs[[N]]
     if(any(x@labeled))
       nms <- names(x@grobs)
     else
@@ -249,13 +250,9 @@ setMethod("print", "Tracks", function(x){
     lst <- lapply(seq_len(N),
                   function(i) {
                     if(i %in% which(x@mutable))
-                      grobs[[i]] <- grobs[[i]] + x@theme
+                        grobs[[i]] <- grobs[[i]] + x@theme
                     grobs[[i]] <- grobs[[i]] + ggplot2::xlab("")  + labs(title = "")
-#                     if(i == 1 && !is.null(x@main)){
-#                       grobs[[i]] <- grobs[[i]] + theme(plot.margin = unit(c(1, 1,
-#                               as.numeric(x@padding),  0.5), "lines"))
-#                     }else{
-                     grobs[[i]] <- grobs[[i]] + theme(plot.margin = unit(c(as.numeric(x@padding), 1,
+                    grobs[[i]] <- grobs[[i]] + theme(plot.margin = unit(c(as.numeric(x@padding), 1,
                               as.numeric(x@padding),  0.5), "lines"))
                     #}
                     if(i %in% which(!x@hasAxis))
@@ -286,7 +283,8 @@ setMethod("print", "Tracks", function(x){
                                              xlab = x@xlab,
                                              main.height = x@main.height,
                                              scale.height = x@scale.height,
-                                             xlab.height = x@xlab.height
+                                             xlab.height = x@xlab.height,
+                                             .scale.grob = .scale.grob
                                              )))
     else
       res <- do.call(alignPlots, c(lst, list(heights = x@heights,
@@ -297,7 +295,8 @@ setMethod("print", "Tracks", function(x){
                                              xlab = x@xlab,
                                              main.height = x@main.height,
                                              scale.height = x@scale.height,
-                                             xlab.height = x@xlab.height
+                                             xlab.height = x@xlab.height,
+                                             .scale.grob = .scale.grob
                                              )))
 
     grid.draw(res)
@@ -573,7 +572,8 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
                        main = NULL,
                        xlab = NULL,
                        remove.y.axis = FALSE,
-                       remove.x.axis = FALSE
+                       remove.x.axis = FALSE,
+                       .scale.grob = NULL
                        ){
 
   if(is.numeric(scale.height) && !is.unit(scale.height))
@@ -608,10 +608,10 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
   if(TRUE){
     idx.fix <- which(!sapply(ggl, fixed) & !sapply(ggl, is, "Ideogram"))[1]
     if(is.na(idx.fix))
-      idx.fix <- 1
-    ggl <- c(ggl, list(ggl[[idx.fix]] + theme_gray()))
+      idx.fix <- length(ggl)
+    ## ggl <- c(ggl, list(ggl[[idx.fix]] + theme_gray()))
+    ggl <- c(ggl, list(.scale.grob))
   }
-
   ## parse grobs
   ## a little slow
   grobs <- do.call(GrobList, ggl)
@@ -706,9 +706,11 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
   names(grobs) <- .nms
 
   if(TRUE){
+
     g.last <- grobs[[length(grobs)]]
     grobs <- grobs[-length(grobs)]
     g <- g.last$grobs[[1]]$children[[1]]$children$layout
+
     g.s <- scaleGrob(g)
     if(length(track.bg.color)){
         rect.grob <- rectGrob(gp=gpar(col = track.bg.color,
