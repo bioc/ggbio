@@ -1004,7 +1004,8 @@ setMethod("autoplot", "RleList", function(object, ...,
 
 setMethod("autoplot", "ExpressionSet", function(object, ...,
                                                 type = c("heatmap","none",
-                                                    "scatterplot.matrix", "pcp", "MA", "boxplot",
+                                                    "scatterplot.matrix",
+                                                    "pcp", "MA", "boxplot",
                                                     "mean-sd"),
                                                 ## "NUSE", "RLE"),
                                                 test.method = "t",
@@ -1018,7 +1019,7 @@ setMethod("autoplot", "ExpressionSet", function(object, ...,
     df.exp <- exprs(object)
     df <- as.data.frame(df.exp)
     if(type == "scatterplot.matrix"){
-stop("not implemented")
+        stop("not implemented")
         p <- ggplot()
     }
     if(type == "heatmap"){
@@ -1047,8 +1048,10 @@ stop("not implemented")
             })
             ry <- c(rep(TRUE, N), FALSE)
             l <- c(l, list(p))
-            return(do.call(alignPlots, c(l, list(vertical = FALSE, remove.y.axis = ry,
-                                                 widths = hts))))
+            res <- do.call(alignPlots, c(l, list(vertical = FALSE,
+                                                      remove.y.axis = ry,
+                                                      widths = hts)))
+            return(grid::grid.draw(res))
         }
     }
     if(type == "pcp"){
