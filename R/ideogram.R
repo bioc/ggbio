@@ -21,7 +21,8 @@ Ideogram <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cytoband 
         if(genome %in% names(ideoCyto)){
           obj <- ideoCyto[[genome]]
         }else{
-          obj <- getIdeogram(genome = genome, subchr = subchr, cytobands = cytobands)
+          obj <- getIdeogram(genome = genome, subchr = subchr,
+                             cytobands = cytoband)
         }
     }
     ## do we need subchr here
@@ -154,6 +155,7 @@ plotIdeogram <- function(obj, subchr = NULL, zoom.region = NULL, which = NULL,
 
     p <- Ideogram(obj,
                   xlabel = xlabel,
+                  cytoband = cytoband,
                   subchr = subchr,
                   aspect.ratio = aspect.ratio,
                   color = color,

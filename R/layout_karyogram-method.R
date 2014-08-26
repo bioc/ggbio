@@ -252,8 +252,10 @@ setMethod("layout_karyogram", "GRanges",
 
 
             }else {
+              ## cytoband = FALSE
               ideo.gr <- getIdeoGR(data)
-              extra.factor <- setdiff(all.vars(as.formula(facets)), c("seqnames", "."))
+              extra.factor <- setdiff(all.vars(as.formula(facets)),
+                                      c("seqnames", "."))
               if(length(extra.factor)){
                 lst <- lapply(unique(values(data)[,extra.factor]), function(i){
                   values(ideo.gr)[, extra.factor] <- i
@@ -261,6 +263,7 @@ setMethod("layout_karyogram", "GRanges",
                 })
                 ideo.gr <- do.call(c, lst)
               }
+
               names(ideo.gr) <- NULL
               df <- as.data.frame(ideo.gr)
               aes.ideo <- do.call(aes, list(xmin = substitute(start),
@@ -271,10 +274,11 @@ setMethod("layout_karyogram", "GRanges",
                                                       list(aes.ideo),
                                                       list(fill = "white", color = "black")))
             }
-            if(!is.null(geom)){
-              df <- mold(data)
-            if(geom == "rect"){
 
+            if(!is.null(geom)){
+                df <- mold(data)
+
+            if(geom == "rect"){
               ## check xmin, ymin, ymax, y
               args.aes.rect <- combineAes(args.aes, list(xmin = substitute(start),
                                        xmax = substitute(end),
@@ -287,11 +291,15 @@ setMethod("layout_karyogram", "GRanges",
 
               ## this hack is to get over 1-pixel problem
               p.addon <- do.call(ggplot2::geom_segment,
-                                 c(list(data = df), list(do.call(aes, args.aes.seg)),args.non))
+                                 c(list(data = df),
+                                   list(do.call(aes, args.aes.seg)),args.non))
 
-              p.addon <- c(list(p.addon), list(do.call(ggplot2::geom_rect,
-                          c(list(data = df), list(do.call(aes, args.aes.rect)),args.non))))
+              p.addon <- c(list(p.addon),
+                           list(do.call(ggplot2::geom_rect,
+                          c(list(data = df),
+                            list(do.call(aes, args.aes.rect)),args.non))))
             }else{
+                ## plot geoms
               .drawFun <- getDrawFunFromGeomStat(geom, stat)
               aes.res <- do.call(aes, args.aes)
               args.res <- c(list(data = df), list(aes.res), args.non)
@@ -299,6 +307,7 @@ setMethod("layout_karyogram", "GRanges",
             }
             p <- list(p.addon , facet_grid(facets))
           }else{
+              ## nothing but background
             p <- list(p.ideo,  facet_grid(facets))
           }
             o <- theme(axis.text.y = element_blank(),
