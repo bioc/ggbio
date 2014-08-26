@@ -477,10 +477,24 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
 
          }
         }
+
         ## cds
         gr.cds <- gr[values(gr)[[.type]] %in% c("cds", "CDS")]
         ## exons
         gr.exons <- gr[values(gr)[[.type]] %in% c("exon", "EXON")]
+
+        ## a hack: when no utl for particular tx, change exon to cds to plot
+        if(stat != "reduce"){
+            .hackFun <- function(gr.exons, gr.cds){
+                .tx_id <- setdiff(unique(gr.exons$tx_id), unique(gr.cds$tx_id))
+                .cds <- gr.exons[gr.exons$tx_id == .tx_id]
+                .cds$type <- unique(gr.cds$type)[1]
+                c(gr.cds,.cds)
+            }
+            gr.cds <- .hackFun(gr.exons, gr.cds)
+        }
+
+
         args.cds.non <- args.non
         args.cds.non$rect.height <- cds.rect.h
         args.exon.non <- args.cds.non
@@ -540,7 +554,9 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
             grr <- reduce(unlist(.grl))
             .gr$..sample.. <- rep(findOverlaps(.grl, grr)@subjectHits,
                                   times = elementLengths(data))
-            df.gaps <- getGaps(c(.gr[values(.gr)[[.type]] %in% c("utr", "cds")]),
+            df.gaps <- getGaps(c(.gr[values(.gr)[[.type]]
+                                     %in% c("utr", "cds", "exon",
+                                            "UTR", "CDS", "EXON")]),
                                group.name = "..sample..")
             df.gaps$stepping <- 1
             ## let's figure out strand
@@ -552,7 +568,9 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
             }
             ## FIXME: fix reduced strand
         }else{
-            df.gaps <- getGaps(c(gr[values(gr)[[.type]] %in% c("utr", "cds")]),
+            df.gaps <- getGaps(c(gr[values(gr)[[.type]]
+                                    %in% c("utr", "cds", "exon",
+                                           "UTR", "CDS", "EXON")]),
                                group.name = "..inner..")
         }
 

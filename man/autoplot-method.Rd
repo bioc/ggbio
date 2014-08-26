@@ -724,8 +724,7 @@ txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 ### code chunk number 27: txdb-visual
 ###################################################
 p1 <- autoplot(txdb, which = genesymbol["ALDOA"], names.expr = "tx_name:::gene_id")
-p2 <- autoplot(txdb, which = genesymbol["ALDOA"], stat = "reduce", color = "brown",
-               fill = "brown")
+p2 <- autoplot(txdb, which = genesymbol["ALDOA"], stat = "reduce", color = "brown", fill = "brown")
 tracks(full = p1, reduce = p2, heights = c(5, 1)) + ylab("")
 
 
@@ -882,6 +881,7 @@ autoplot(eset, geom = "tile", color = "white", size = 2)
 autoplot(eset, geom = "tile", aes(width = 0.6, height = 0.6))
 
 autoplot(eset, pheno.plot = TRUE)
+
 idx <- order(pData(eset)[,1])
 eset2 <- eset[,idx]
 autoplot(eset2, pheno.plot = TRUE)
