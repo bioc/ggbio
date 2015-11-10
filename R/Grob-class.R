@@ -1,4 +1,5 @@
-.supportedPlots <- c("gg", "trellis", "GGbio")
+## .supportedPlots <- c("gg", "trellis", "GGbio")
+.supportedPlots <- c("gg", "GGbio")
 isSupportedPlots <- function(x){
   sapply(x, function(z){
     any(sapply(.supportedPlots, function(c){
@@ -21,13 +22,13 @@ setMethod("Grob", "gtable", function(x){
   ## new("ggplotGrob", x)
   x
 })
-setMethod("Grob", "trellis", function(x){
-  ## new("latticeGrob", latticeGrob(x))
-  gridExtra:::latticeGrob(x)
-})
-setMethod("Grob", "lattice", function(x){
-  x
-})
+## setMethod("Grob", "trellis", function(x){
+##   ## new("latticeGrob", latticeGrob(x))
+##   gridExtra:::latticeGrob(x)
+## })
+## setMethod("Grob", "lattice", function(x){
+##   x
+## })
 
 setMethod("Grob", "GGbio", function(x){
    ## new("ggplotGrob", ggplotGrob(x@ggplot))

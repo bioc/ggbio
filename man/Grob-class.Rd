@@ -4,12 +4,12 @@
 \alias{Grob-method}
 \alias{Grob,gg-method}
 \alias{Grob,gtable-method}
-\alias{Grob,trellis-method}
-\alias{Grob,lattice-method}
+%% \alias{Grob,trellis-method}
+%% \alias{Grob,lattice-method}
 \alias{Grob,GGbio-method}
 \alias{GrobList-class}
 \alias{ggplotGrob-class}
-\alias{latticeGrob-class}
+%% \alias{latticeGrob-class}
 \alias{GrobList}
 \title{Grob getter}
 \description{
@@ -22,8 +22,8 @@
 \usage{
 \S4method{Grob}{gg}(x)
 \S4method{Grob}{gtable}(x)
-\S4method{Grob}{trellis}(x)
-\S4method{Grob}{lattice}(x)
+%% \S4method{Grob}{trellis}(x)
+%% \S4method{Grob}{lattice}(x)
 \S4method{Grob}{GGbio}(x)
 }
 \arguments{
