@@ -86,4 +86,3 @@ setMethod("stat_reduce", "TxDb", function(data, ...){
 
 
 
-

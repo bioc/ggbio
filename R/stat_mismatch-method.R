@@ -82,7 +82,7 @@ setMethod("stat_mismatch", "GRanges", function(data, ..., bsgenome,
                 list(aes.res),
                 args.non)
   if(show.coverage)
-    p <- list(do.call(ggplot2::geom_polygon, args.res))
+    p <- list(do.ggcall(ggplot2::geom_polygon, args.res))
   else
     p <- NULL
   DNABasesColor <- getBioColor("DNA_BASES_N")
@@ -138,7 +138,7 @@ setMethod("stat_mismatch", "BamFile", function(data, ...,  bsgenome, which,
       stop("bsgenome must be A BSgenome object")
     }
     data <- data$path
-    pgr <- pileupAsGRanges(data, region = which)
+    pgr <- pileupAsGRanges(data, regions = which)
     if(length(pgr)){    
     pgr.match <- pileupGRangesAsVariantTable(pgr, bsgenome)
     p <- stat_mismatch(pgr.match, ..., show.coverage = show.coverage, geom = geom)

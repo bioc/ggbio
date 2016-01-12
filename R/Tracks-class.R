@@ -744,7 +744,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
                        label.width = label.width)
   }else{
     if(any(!is.null(nms)))
-      grobs <- addLabel(lgrobs, nms, lbs,
+      grobs <- addLabel(grobs, nms, lbs,
                         label.bg.color =  label.bg.color,
                        label.bg.fill = label.bg.fill,
                        label.text.color = label.text.color,

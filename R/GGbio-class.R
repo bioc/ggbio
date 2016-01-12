@@ -77,10 +77,10 @@ setMethod("$", "GGbio",
 
 
 ## combine command if circle presents
-.circle.geoms <- c("point","line", "link",
-                   "ribbon","rect", "bar",
-                   "segment","hist", "scale",
-                   "heatmap", "ideogram", "text")
+.layout_circle.geoms <- c("point","line", "link",
+                          "ribbon","rect", "bar",
+                          "segment","hist", "scale",
+                          "heatmap", "ideogram", "text")
 
 ## FIXME, need geom_* for something like ideogram
 .combineNames <- function(obj){
@@ -356,7 +356,7 @@ mapToGG <- function(p, object){
 }
 
 returnProto <- function(object){
-    rapply(object, function(x) x, "proto", how = "unlist")
+    rapply(object, function(x) x, c("proto", "ggproto"), how = "unlist")
 }
 
 

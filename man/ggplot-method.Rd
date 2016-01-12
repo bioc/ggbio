@@ -1,5 +1,6 @@
 \name{ggplot}
 \alias{ggplot.Vector}
+\alias{ggplot.Seqinfo}
 \alias{ggplot.matrix}
 \alias{ggplot.ExpressionSet}
 \alias{ggplot.RsamtoolsFile}
@@ -7,6 +8,8 @@
 \alias{ggplot.TxDb}
 \alias{ggplot.BSgenome}
 \alias{ggplot.SummarizedExperiment}
+\alias{ggplot.GAlignments}
+\alias{ggplot.VCF}
 
 \title{ggplot methods}
 
@@ -18,6 +21,8 @@
  
 \usage{
 \method{ggplot}{Vector}(data, mapping = aes(), \dots,
+                        environment = parent.frame())
+\method{ggplot}{Seqinfo}(data, mapping = aes(), \dots,
                         environment = parent.frame())
 \method{ggplot}{ExpressionSet}(data, mapping = aes(), \dots,
                         environment = parent.frame())
@@ -31,8 +36,12 @@
                         environment = parent.frame())
 \method{ggplot}{character}(data, mapping = aes(), \dots,
                         environment = parent.frame())
-\method{ggplot}{SummarizedExperiemnt}(data, mapping = aes(),
+\method{ggplot}{SummarizedExperiment}(data, mapping = aes(),
                         assay.id = 1L, \dots, environment = parent.frame())
+\method{ggplot}{GAlignments}(data, mapping = aes(), \dots,
+                        environment = parent.frame())
+\method{ggplot}{VCF}(data, mapping = aes(), \dots,
+                        environment = parent.frame())
 }
 \arguments{
   \item{data}{

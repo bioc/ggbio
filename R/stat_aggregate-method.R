@@ -17,7 +17,7 @@ setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by,
   select <- match.arg(select)
   
   if(is.null(geom))
-    geom <- "histogram"
+    geom <- "bar"
 
   if(is.null(window))
     window <- as.integer(width(range(ranges(data)))/20)
@@ -145,7 +145,7 @@ setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by,
   if(".value" %in% colnames(res)  && all(is.na(res$.value))){
     stop("no hits found, please tweak with parametters select and type.")
   }
-  if(!geom %in% c("boxplot", "histogram", "bar")){
+  if(!geom %in% c("boxplot", "bar")){
     args.aes$x <- substitute(.mid)
     args.aes$y <- substitute(.value)
   }else{
@@ -163,10 +163,10 @@ setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by,
                 list(aes.res),
                 args.non)
   if(!geom %in% c("boxplot")){
-    p <- do.call(ggplot2::stat_identity, args.res)
+    p <- do.ggcall(ggplot2::stat_identity, args.res)
    }else{
      args.res <- args.res[!names(args.res) %in% "geom"]
-     p <- do.call(stat_boxplot, args.res)
+     p <- do.ggcall(stat_boxplot, args.res)
    }
   p <- c(list(p) , list(facet))
   if(missing(xlab)) 
@@ -182,6 +182,7 @@ setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by,
 })
 
 
+### ML: Is this function even called anywhere?
 
 .aggregate <- function(data, ..., xlab, ylab, main, by, FUN, maxgap=0L,
                             minoverlap=1L, type=c("any", "start", "end", "within",
@@ -197,7 +198,7 @@ setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by,
   select <- match.arg(select)
   
   if(is.null(geom))
-    geom <- "histogram"
+    geom <- "bar"
 
   if(is.null(window))
     window <- as.integer(width(range(ranges(data)))/nbin)

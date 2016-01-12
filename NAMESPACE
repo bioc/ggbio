@@ -7,8 +7,8 @@ import(methods)
 ### base packages
 ###
 
-importFrom(grid, arrow, convertUnit, editGrob, gList, gTree, gpar, grid.draw,
-           grid.newpage, grobTree, is.unit, rectGrob, textGrob, unit, unit.c)
+importFrom(grid, convertUnit, editGrob, gList, gTree, gpar, grid.draw,
+           grid.newpage, grobTree, is.unit, rectGrob, textGrob, unit.c)
 importFrom(grDevices, dev.off, png)
 importFrom(graphics, par)
 importFrom(stats, approx, as.formula, df)
@@ -68,9 +68,14 @@ importMethodsFrom(GenomicFeatures, exonsBy)
 importClassesFrom(VariantAnnotation, VCF)
 importMethodsFrom(VariantAnnotation, fixed, "fixed<-", ref,
                   alt, info, geno)
+importFrom(VariantAnnotation, readVcf)
 
 ## OrganismDb
 importClassesFrom(OrganismDbi, OrganismDb)
+
+## tools
+importFrom(tools, file_ext, file_path_sans_ext)
+
 ## ============================================================
 ## Export
 ## ============================================================
@@ -143,6 +148,7 @@ export(zoom, zoom_in, zoom_out, nextView, prevView)
 ##               cached_which, cbind, rbind)
 ## export(PlotList, Tracked, Plot, Grob)
 
+
 S3method(ggplot, Vector)
 S3method(ggplot, matrix)
 S3method(ggplot, ExpressionSet)
@@ -150,3 +156,7 @@ S3method(ggplot, RsamtoolsFile)
 S3method(ggplot, character)
 S3method(ggplot, TxDb)
 S3method(ggplot, BSgenome)
+S3method(ggplot, SummarizedExperiment)
+S3method(ggplot, GAlignments)
+S3method(ggplot, VCF)
+S3method(ggplot, Seqinfo)
