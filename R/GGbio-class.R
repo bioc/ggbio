@@ -181,11 +181,11 @@ setMethod("+", c("GGbio"), function(e1, e2){
         args$radius <- r.cur
         args$trackWidth <- t.addon
 
-        if(!"data" %in% names(args)){
-            if(is.null(names(args[[1]])) && is(args[[1]], "GRanges")){
-                names(args)[1] <- "data"
-
-            }else{
+        if(!"data" %in% names(args)) {
+            unnamed <- names(args) == ""
+            if(any(unnamed)) {
+                names(args)[which(unnamed)[1L]] <- "data"
+            } else {
                 stop("no data found")
             }
         }
@@ -305,7 +305,7 @@ setMethod("+", c("GGbio"), function(e1, e2){
 replaceArg <- function(p, args){
     .cmd <- lapply(p@cmd, function(cm){
         .args <- as.list(cm)
-        .args[names(args)] <- args[[1]]
+        .args[[names(args)]] <- args[[1]]
         as.call(.args)
         ## do.call(as.character(.fun), .arg)
     })
